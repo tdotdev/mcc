@@ -7,7 +7,7 @@
 
 int main()
 {
-	std::cout << "succesfful push";
+	
 
 	std::ifstream source_file("test.mc");
 	std::string source;
@@ -18,12 +18,17 @@ int main()
 
 	lexer lex(source);
 
-	std::vector<token> tokens;
+	std::vector<token*> tokens;
+
 	while(!lex.eof()){
 		tokens.push_back(lex.scan());
 	}
 
-	tokens.push_back(tokens[0]);
+	
+	for (int i = 0; i < tokens.size(); ++i) {
+		std::cout << tokens[i]->to_string() << "\n";
+	}
+	
 	char a;
 	std::cin >> a;
 

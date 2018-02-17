@@ -6,6 +6,15 @@ lexer::lexer(std::string &source) {
 	last = &source[source.length() - 1];
 }
 
+void lexer::accept(int n)
+{
+	for (int i = 0; i < n; ++i)
+	{
+		assert(!eof());
+		++first;
+	}
+}
+
 const char lexer::peek(int n) {
 	assert(!eof());
 	const char* c = first;
@@ -28,6 +37,8 @@ bool lexer::is_digit(const char c) {
 	return std::isdigit(c);
 }
 
+
+
 bool lexer::is_alpha(const char c) {
 	assert(!eof());
 	return std::isalpha(c);
@@ -42,14 +53,14 @@ void lexer::skip_whitespace() {
 	assert(!eof());
 
 	while (!eof() && is_space(*first))
-		++first;
+		accept(1);
 }
 
 void lexer::skip_newline() {
 	assert(!eof());
 
 	while (!eof() && is_newline(*first))
-		++first;
+		accept(1);
 }
 
 void lexer::skip_comment() {
@@ -57,106 +68,178 @@ void lexer::skip_comment() {
 	assert(*first == '#');
 
 	while (!is_newline(*first))
-		++first;
+		accept(1);
 }
 
-token lexer::lex_puncuator(token_name name) {
-	++first;
-	return token{ name };
+token* lexer::lex_puncuator(token_name name) {
+	accept(1);
+	return new token{ name };
 }
 
 
-token lexer::lex_relational_operator(relational_op op) {
-	if (op == op_le || op == op_ge) {
-		++first;
-		++first;
+token* lexer::lex_relational_operator(token_name op) {
+	if (op == tok_rel_le || op == tok_rel_ge) {
+		accept(2);
 	}
 	else {
-		++first;
+		accept(1);
 	}
-	return token(op); 
+	return new token(op); 
 }
 
-token lexer::lex_arithmetic_operator(arithmetic_op op){
-	++first;
-	return token(op); 
+token* lexer::lex_arithmetic_operator(token_name op){
+	accept(1);
+	return new token(op);
 }
-token lexer::lex_bitwise_operator(bitwise_op op) {
-	++first;
-	return token(op);
-}
-
-token lexer::lex_logical_operator(logical_op op) {
-	++first;
-	return token(op);
+token* lexer::lex_bitwise_operator(token_name op) {
+	accept(1);
+	return new token(op);
 }
 
-token lexer::lex_conditional_operator(){ return token(tok_conditional_operator); }
-token lexer::lex_assignment_operator(){ return token(tok_assignment_operator); }
+token* lexer::lex_logical_operator(token_name op) {
+	accept(1);
+	return new token(op);
+}
 
-token lexer::lex_identifier(){ return token(); }
+token* lexer::lex_conditional_operator()
+{ 
+	accept(1);
+	return new token(tok_conditional_operator); 
+}
 
-token lexer::lex_binary_integer(){ return token(); }
-token lexer::lex_decimal_integer(){ return token(); }
-token lexer::lex_floating_point(){ return token(); }
-token lexer::lex_character(){ return token(); }
-token lexer::lex_escape_sequence(){ return token(); }
-token lexer::lex_string(){ return token(); }
+token* lexer::lex_assignment_operator()
+{ 
+	accept(1);
+	return new token(tok_assignment_operator); 
+}
 
+token* lexer::lex_num() {
+	
+	if (*first == '0') {
+		if (tolower(peek(1)) == 'b')
+		{
+			return lex_binary_integer();
+		}
+		else if (tolower(peek(1)) == 'x')
+		{
+			return lex_hexadecimal_integer();
+		}
+	}
+	else {
+		return lex_decimal_integer();
+	}
 
+	return new token();
+}
 
+token* lexer::lex_binary_integer()
+{
+	std::string num;
+	accept(2);
+	while (*first == '0' || *first == '1') {
+		num += *first;
+		accept(1);
+	}
 
+	return new integer(tok_binary_integer, std::strtoll(num.c_str(), nullptr, 2), binary);
+}
+token* lexer::lex_decimal_integer()
+{
+	std::string num;
 
-token lexer::lex_word() {
+	while (is_digit(*first)) {
+		num += *first;
+		accept(1);
+	}
+
+	std::istringstream buffer(num);
+	int value;
+	buffer >> value;
+
+	return new integer(tok_decimal_integer, value, decimal);
+}
+
+token* lexer::lex_hexadecimal_integer() 
+{
+	std::string num;
+	accept(2);
+	while (std::isxdigit(*first)) {
+		num += *first;
+		accept(1);
+	}
+
+	return new integer(tok_hexadecimal_integer, std::strtoll(num.c_str(), nullptr, 16), hexadecimal);
+}
+
+token* lexer::lex_floating_point()
+{ 
+	return new token(); 
+}
+
+token* lexer::lex_character()
+{ 
+	character* tok = new character(peek(1));
+	accept(3);
+	return tok;
+}
+token* lexer::lex_escape_sequence(){ return new token(); }
+
+token* lexer::lex_string()
+{ 
+	std::string word{ "" };
+
+	accept(1); // first "
+	while (*first != '"')
+	{
+		word += *first;
+		accept(1);
+	}
+
+	accept(1); // second "
+
+	return new string(word); 
+}
+
+token* lexer::lex_word() {
+	
 	std::string word{ "" };
 
 	while (!is_space(*first) && !eof() && is_alpha(*first)) {
 		word += *first;
-		++first;
+		accept(1);
 	}
 
-	std::map<std::string, token>::const_iterator got = kw_table.find(word);
+	std::map<std::string, token_name>::const_iterator got = reserved.find(word);
+
 
 	// not a keyword, new id
-	if (got == kw_table.end()) {
-		kw_table.insert(std::make_pair(word, tok_identifier));
-		symbol s = &word;
-		token t(s);
-		return t;
+	if (got == reserved.end()) {
+		reserved.insert(std::make_pair(word, tok_identifier));
+		return new identifier(word);;
 	}
 	// is a keyword or previous id
 	else {
-		token t(kw_table.at(word));
-		return t;
-	}
-	
-	
-
-}
-
-token lexer::lex_num() {
-	std::string word{ "" };
-
-	if (*first == 0) {
-		if (tolower(peek(1)) == 'b')
-		{
-			
+		
+		if (reserved.at(word) == tok_true) {
+			return new boolean(true);
 		}
-		else if (tolower(peek(1)) == 'x')
-		{
-
+		else if (reserved.at(word) == tok_false) {
+			return new boolean(false);
+		}
+		else {
+			return new token(reserved.at(word));
 		}
 	}
-	else {
-		return token();
-	}
 
-	return token();
+
+	return new token();
 }
+
+
+
  
-token lexer::scan() {
+token* lexer::scan() {
 	while (!eof()) {
-		std::cout << *first;
 		switch (*first) {
 			case ' ':
 				skip_whitespace();
@@ -187,48 +270,48 @@ token lexer::scan() {
 				return lex_puncuator(tok_colon);
 			case '=':
 				if (peek(1) == '=') {
-					return lex_relational_operator(op_eq);
+					return lex_relational_operator(tok_rel_eq);
 				}
 				else {
 					return lex_assignment_operator();
 				}
 			case '!':
 				if(peek(1) == '=')
-					return lex_relational_operator(op_ne);
+					return lex_relational_operator(tok_rel_neq);
 				else
-					return lex_bitwise_operator(op_not);
+					return lex_bitwise_operator(tok_bitw_not);
 			case '<':
 				if (peek(1) == '=') {
-					return lex_relational_operator(op_le);
+					return lex_relational_operator(tok_rel_le);
 				}
 				else {
-					return lex_relational_operator(op_lt);
+					return lex_relational_operator(tok_rel_lt);
 				}
 			case '>':
 				if (peek(1) == '=') {
-					return lex_relational_operator(op_ge);
+					return lex_relational_operator(tok_rel_ge);
 				}
 				else {
-					return lex_relational_operator(op_gt);
+					return lex_relational_operator(tok_rel_gt);
 				}
 			case '+':
-				return lex_arithmetic_operator(op_add);
+				return lex_arithmetic_operator(tok_add);
 			case '-':
-				return lex_arithmetic_operator(op_sub);
+				return lex_arithmetic_operator(tok_sub);
 			case '*':
-				return lex_arithmetic_operator(op_mul);
+				return lex_arithmetic_operator(tok_mul);
 			case '/':
-				return lex_arithmetic_operator(op_div);
+				return lex_arithmetic_operator(tok_div);
 			case '%':
-				return lex_arithmetic_operator(op_rem);
+				return lex_arithmetic_operator(tok_rem);
 			case '&':
-				return lex_bitwise_operator(op_and);
+				return lex_bitwise_operator(tok_bitw_and);
 			case '|':
-				return lex_bitwise_operator(op_or);
+				return lex_bitwise_operator(tok_bitw_or);
 			case '^':
-				return lex_bitwise_operator(op_xor);
-			case '~':
-				return lex_bitwise_operator(op_not);
+				return lex_bitwise_operator(tok_bitw_xor);
+			case '~': 
+				return lex_bitwise_operator(tok_bitw_not);
 			case '?':
 				return lex_conditional_operator();
 			case '\'':
@@ -249,9 +332,9 @@ token lexer::scan() {
 				std::cout << "If you made it this far... there is an error\n";
 				continue;
 
-				return token();
+				return new token();
 		}
 	}
 
-	return token();
+	return new token();
 }

@@ -1,16 +1,22 @@
 #include "token.hpp"
 
-#include <cassert>
-#include <iostream>
-#include <iomanip>
+std::string radix_to_string(radix r) {
+	switch(r) {
+		case binary:
+			return "binary";
+		case hexadecimal:
+			return "hexadecimal";
+		case decimal:
+			return "decimal";
+	}
+}
 
-const char*
-to_string(token_name n)
-{
-	switch (n) {
+std::string token_name_to_string(token_name name) {
+	switch (name) {
 	case tok_eof:
 		return "eof";
-
+	case tok_tok:
+		return "token";
 	case tok_left_brace:
 		return "left-brace";
 	case tok_right_brace:
@@ -29,128 +35,83 @@ to_string(token_name n)
 		return "semicolon";
 	case tok_colon:
 		return "colon";
-
-	case tok_relational_operator:
-		return "relational-operator";
-	case tok_arithmetic_operator:
-		return "arithmetic-operator";
-	case tok_bitwise_operator:
-		return "bitwise-operator";
-	case tok_logical_operator:
-		return "logical-operator";
 	case tok_conditional_operator:
 		return "conditional-operator";
 	case tok_assignment_operator:
 		return "assignment-operator";
-
-	case kw_def:
+	case tok_kw_def:
 		return "def";
-	case kw_else:
+	case tok_kw_else:
 		return "else";
-	case kw_if:
+	case tok_kw_if:
 		return "if";
-	case kw_let:
+	case tok_kw_let:
 		return "let";
-	case kw_var:
+	case tok_kw_var:
 		return "var";
-
 	case tok_identifier:
 		return "identifier";
 	case tok_binary_integer:
-		return "binary-integer";
+		return "binary-integer-literal";
 	case tok_decimal_integer:
-		return "decimal-integer";
+		return "decimal-integer-literal";
 	case tok_hexadecimal_integer:
-		return "hexadecimal-integer";
+		return "hexadecimal-integer-literal";
 	case tok_boolean:
-		return "boolean";
+		return "boolean-literal";
 	case tok_floating_point:
-		return "floating-point";
+		return "floating-point-literal";
 	case tok_character:
-		return "character";
+		return "character-literal";
 	case tok_string:
-		return "string";
-	case tok_type_specifier:
-		return "type-specifier";
+		return "string-literal";
+	case tok_rel_eq:
+		return "relational-eq";
+	case tok_rel_neq:
+		return "relational-neq";
+	case tok_rel_lt:
+		return "relational-lt";
+	case tok_rel_gt:
+		return "relational-gt";
+	case tok_rel_le:
+		return "relational-le";
+	case tok_rel_ge:
+		return "relational-ge";
+	case tok_add:
+		return "arithmetic-add";
+	case tok_sub:
+		return "arithmetic-sub";
+	case tok_mul:
+		return "arithmetic-mul";
+	case tok_div:
+		return "arithmetic-div";
+	case tok_rem:
+		return "arithmetic-rem";
+	case tok_bitw_and:
+		return "bitwise-and";
+	case tok_bitw_or:
+		return "bitwise-or";
+	case tok_bitw_xor:
+		return "bitwise-xor";
+	case tok_bitw_not:
+		return "bitwise-not";
+	case tok_logical_and:
+		return "logical-and";
+	case tok_logical_or:
+		return "logical-or";
+	case tok_logical_not:
+		return "logcial-not";
+	case tok_ts_char:
+		return "type-char";
+	case tok_ts_bool:
+		return "type-bool";
+	case tok_ts_int:
+		return "type-int";
+	case tok_ts_float:
+		return "type-float";
+	case tok_false:
+		return "false";
+	case tok_true:
+		return "true";
 	}
 }
-
-// Kinds of relational operator
-const char*
-to_string(relational_op op)
-{
-	switch (op) {
-	case op_eq:
-		return "eq";
-	case op_ne:
-		return "ne";
-	case op_lt:
-		return "lt";
-	case op_gt:
-		return "gt";
-	case op_le:
-		return "le";
-	case op_ge:
-		return "ge";
-	}
-};
-
-const char*
-to_string(arithmetic_op op)
-{
-	switch (op) {
-	case op_add:
-		return "add";
-	case op_sub:
-		return "sub";
-	case op_mul:
-		return "mul";
-	case op_div:
-		return "quo";
-	case op_rem:
-		return "rem";
-	}
-};
-
-const char*
-to_string(bitwise_op op)
-{
-	switch (op) {
-	case op_and:
-		return "and";
-	case op_or:
-		return "ior";
-	case op_xor:
-		return "xor";
-	case op_not:
-		return "not";
-	}
-};
-
-const char*
-to_string(logical_op op)
-{
-	switch (op) {
-	case logical_and:
-		return "and";
-	case logical_or:
-		return "or";
-	case logical_not:
-		return "not";
-	}
-};
-
-const char*
-to_string(type_spec ts)
-{
-	switch (ts) {
-	case ts_bool:
-		return "char";
-	case ts_int:
-		return "int";
-	case ts_char:
-		return "char";
-	case ts_float:
-		return "float";
-	}
-};

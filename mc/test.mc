@@ -1,15 +1,27 @@
-int a;
 
-bool b;
+punctuators
+{}()[],;:
 
-b <= a;
+operators
+==!=<><=>=
 
-< < <
+reserved words
+and
+bool
+char
+def
+else
+false
+float
+if
+int
+let
+not
+or
+true
+var
 
-#this is a comment
-
-           
-
-char a;
-
-int charb;
+integers
+12000
+0b00101
+0xaf10
