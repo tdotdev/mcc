@@ -7,6 +7,7 @@
 
 int main()
 {
+	std::cout << "succesfful push";
 
 	std::ifstream source_file("test.mc");
 	std::string source;
