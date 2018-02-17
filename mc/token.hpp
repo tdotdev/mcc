@@ -1,18 +1,11 @@
 #pragma once
 
-
 #include <iostream>
 #include <cassert>
 #include <string>
 
-
-
 enum token_name
 {
-	// Miscellaneous
-	tok_eof,
-	tok_tok,
-
 	// Punctuators
 	tok_left_brace,
 	tok_right_brace,
@@ -23,14 +16,6 @@ enum token_name
 	tok_comma,
 	tok_semicolon,
 	tok_colon,
-
-	// Operators
-	tok_relational_operator, // ==, !=, <, >, <=, >=
-	tok_arithmetic_operator, // +, -, *, /, %
-	tok_bitwise_operator, // &, |, ^, ~
-	tok_logical_operator, // and, or, not
-	tok_conditional_operator, // ?
-	tok_assignment_operator, // =
 
 	// Keywords
 	tok_kw_def,
@@ -47,6 +32,9 @@ enum token_name
 	tok_floating_point,
 	tok_character,
 	tok_string,
+
+	tok_conditional_operator,
+	tok_assignment_operator,
 
 	// rel ops
 	tok_rel_eq,
@@ -80,13 +68,14 @@ enum token_name
 	tok_ts_int,
 	tok_ts_float,
 
-	// bool values
+	// boolean values
 	tok_false,
 	tok_true,
+
+	// other
+	tok_eof,
+	tok_tok,
 };
-
-
-
 
 enum radix
 {
@@ -152,7 +141,6 @@ struct boolean : token {
 	}
 };
 
-
 struct character : token {
 	char val;
 
@@ -165,7 +153,6 @@ struct character : token {
 		return "<" + token_name_to_string(name) + ": " + val + ">";
 	}
 };
-
 
 struct string : token {
 	std::string val;
@@ -180,8 +167,6 @@ struct string : token {
 	}
 };
 
-
-
 struct identifier : token {
 	std::string id;
 
@@ -193,5 +178,4 @@ struct identifier : token {
 	std::string to_string() {
 		return "<" + token_name_to_string(name) + ": " + id + ">";
 	}
-
 };

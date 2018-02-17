@@ -8,10 +8,8 @@
 #include <cctype>
 #include <map>
 
-
-
 struct lexer {
-	
+
 	std::map<std::string, token_name> reserved{
 		{"and", tok_logical_and},
 		{ "bool", tok_ts_bool},
@@ -29,16 +27,14 @@ struct lexer {
 		{ "var", tok_kw_var},
 	};
 
-	
-
 	const char* first;
 	const char* last;
 
 	lexer(std::string& source);
-	token* scan();
 
+	token* scan();
+	const char peek(int n);
 	bool eof();
-	const char peek(int n);	
 
 	bool is_space(const char c);
 	bool is_newline(const char c);
@@ -66,9 +62,5 @@ struct lexer {
 	token* lex_character();
 	token* lex_escape_sequence();
 	token* lex_string();
-
-	
-	
-
 
 };
