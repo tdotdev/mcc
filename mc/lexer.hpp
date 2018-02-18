@@ -1,12 +1,14 @@
 #pragma once
 
 #include "token.hpp"
+#include "location.hpp"
 #include <string>
 #include <sstream>
 #include <cassert>
 #include <iostream>
 #include <cctype>
 #include <map>
+
 
 struct lexer {
 
@@ -29,6 +31,7 @@ struct lexer {
 
 	const char* first;
 	const char* last;
+	location current;
 
 	lexer(std::string& source);
 

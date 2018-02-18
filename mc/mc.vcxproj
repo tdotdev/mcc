@@ -117,6 +117,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lexer.hpp" />
+    <ClInclude Include="location.hpp" />
     <ClInclude Include="token.hpp" />
   </ItemGroup>
   <ItemGroup>

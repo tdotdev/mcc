@@ -4,6 +4,7 @@ lexer::lexer(std::string &source)
 {
 	first = &source[0];
 	last = &source[source.length() - 1];
+	current = 0;
 }
 
 void lexer::accept(int n)
@@ -12,6 +13,7 @@ void lexer::accept(int n)
 	{
 		assert(!eof());
 		++first;
+		++current;
 	}
 }
 
@@ -81,7 +83,7 @@ void lexer::skip_comment()
 token* lexer::lex_puncuator(token_name name) 
 {
 	accept(1);
-	return new token{ name };
+	return new token(name, current);
 }
 
 token* lexer::lex_relational_operator(token_name op) 
@@ -91,36 +93,36 @@ token* lexer::lex_relational_operator(token_name op)
 	else
 		accept(1);
 
-	return new token(op); 
+	return new token(op, current);
 }
 
 token* lexer::lex_arithmetic_operator(token_name op)
 {
 	accept(1);
-	return new token(op);
+	return new token(op, current);
 }
 token* lexer::lex_bitwise_operator(token_name op) 
 {
 	accept(1);
-	return new token(op);
+	return new token(op, current);
 }
 
 token* lexer::lex_logical_operator(token_name op) 
 {
 	accept(1);
-	return new token(op);
+	return new token(op, current);
 }
 
 token* lexer::lex_conditional_operator()
 { 
 	accept(1);
-	return new token(tok_conditional_operator); 
+	return new token(tok_conditional_operator, current);
 }
 
 token* lexer::lex_assignment_operator()
 { 
 	accept(1);
-	return new token(tok_assignment_operator); 
+	return new token(tok_assignment_operator, current);
 }
 
 token* lexer::lex_num() 
@@ -148,7 +150,7 @@ token* lexer::lex_binary_integer()
 		accept(1);
 	}
 
-	return new integer(tok_binary_integer, std::strtoll(num.c_str(), nullptr, 2), binary);
+	return new integer(tok_binary_integer, std::strtoll(num.c_str(), nullptr, 2), binary, current);
 }
 
 token* lexer::lex_decimal_integer()
@@ -165,7 +167,7 @@ token* lexer::lex_decimal_integer()
 	std::istringstream buffer(num);
 	buffer >> value;
 
-	return new integer(tok_decimal_integer, value, decimal);
+	return new integer(tok_decimal_integer, value, decimal, current);
 }
 
 token* lexer::lex_hexadecimal_integer() 
@@ -179,7 +181,7 @@ token* lexer::lex_hexadecimal_integer()
 		accept(1);
 	}
 
-	return new integer(tok_hexadecimal_integer, std::strtoll(num.c_str(), nullptr, 16), hexadecimal);
+	return new integer(tok_hexadecimal_integer, std::strtoll(num.c_str(), nullptr, 16), hexadecimal, current);
 }
 
 token* lexer::lex_floating_point()
@@ -232,7 +234,7 @@ token* lexer::lex_character()
 		c = *first;
 	}
 	accept(2);
-	return new character(c);
+	return new character(c, current);
 }
 
 token* lexer::lex_escape_sequence(){ return new token(); }
@@ -249,7 +251,7 @@ token* lexer::lex_string()
 	}
 	accept(1);
 
-	return new string(word); 
+	return new string(word, current);
 }
 
 token* lexer::lex_word() {
@@ -267,19 +269,19 @@ token* lexer::lex_word() {
 	// symbol not found in table, add it!
 	if (got == reserved.end()) {
 		reserved.insert(std::make_pair(word, tok_identifier));
-		return new identifier(word);;
+		return new identifier(word, current);;
 	}
 	// a reserved word or identifier
 	else 
 	{
 		if (reserved.at(word) == tok_true)
-			return new boolean(true);
+			return new boolean(true, current);
 
 		else if (reserved.at(word) == tok_false)
-			return new boolean(false);
+			return new boolean(false, current);
 
 		else 
-			return new token(reserved.at(word));
+			return new token(reserved.at(word), current);
 	}
 }
 

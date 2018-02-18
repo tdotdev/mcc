@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cassert>
 #include <string>
+#include "location.hpp"
 
 enum token_name
 {
@@ -89,10 +90,12 @@ std::string radix_to_string(radix);
 
 struct token {
 	token_name name;
+	location loc;
 
 	token() = default;
-	token(token_name n) {
+	token(token_name n, location l) {
 		name = n;
+		loc = l;
 	}
 
 	virtual std::string to_string() {
@@ -104,10 +107,11 @@ struct integer : token {
 	long long val;
 	radix rad;
 
-	integer(token_name n, long long v, radix r) {
+	integer(token_name n, long long v, radix r, location l) {
 		val = v;
 		rad = r;
 		name = n;
+		loc = l;
 	}
 
 	std::string to_string() {
@@ -118,9 +122,10 @@ struct integer : token {
 struct floating_point : token {
 	double val;
 
-	floating_point(double num) {
+	floating_point(double num, location l) {
 		name = tok_floating_point;
 		val = num;
+		loc = l;
 	}
 
 	std::string to_string() {
@@ -131,9 +136,10 @@ struct floating_point : token {
 struct boolean : token {
 	bool val;
 
-	boolean(bool tf) {
+	boolean(bool tf, location l) {
 		name = tok_boolean;
 		val = tf;
+		loc = l;
 	}
 
 	std::string to_string() {
@@ -144,9 +150,10 @@ struct boolean : token {
 struct character : token {
 	char val;
 
-	character(char c) {
+	character(char c, location l) {
 		name = tok_character;
 		val = c;
+		loc = l;
 	}	
 	
 	std::string to_string() {
@@ -185,9 +192,10 @@ struct character : token {
 struct string : token {
 	std::string val;
 
-	string(std::string str) {
+	string(std::string str, location l) {
 		name = tok_string;
 		val = str;
+		loc = l;
 	}
 
 	std::string to_string() {
@@ -198,9 +206,10 @@ struct string : token {
 struct identifier : token {
 	std::string id;
 
-	identifier(std::string str) {
+	identifier(std::string str, location l) {
 		name = tok_identifier;
 		id = str;
+		loc = l;
 	}
 
 	std::string to_string() {
