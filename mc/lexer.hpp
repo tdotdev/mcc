@@ -64,7 +64,6 @@ struct lexer {
 	token* lex_decimal_integer();
 	token* lex_floating_point();
 	token* lex_character();
-	token* lex_escape_sequence();
 	token* lex_string();
 
 };

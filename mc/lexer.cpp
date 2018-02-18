@@ -265,7 +265,6 @@ token* lexer::lex_character()
 	return new character(c, current);
 }
 
-token* lexer::lex_escape_sequence(){ return new token(); }
 
 token* lexer::lex_string()
 { 
