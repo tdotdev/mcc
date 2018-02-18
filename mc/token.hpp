@@ -150,7 +150,35 @@ struct character : token {
 	}	
 	
 	std::string to_string() {
-		return "<" + token_name_to_string(name) + ": " + val + ">";
+		std::string value;
+
+		switch (val) {
+			case '\a':
+				value = "alert";
+				break;
+			case '\b':
+				value = "backspace";
+				break;
+			case '\f':
+				value = "formfeed";
+				break;
+			case '\n':
+				value = "newline";
+				break;
+			case '\r':
+				value = "carriage-return";
+				break;
+			case '\t':
+				value = "horizontal-tab";
+				break;
+			case '\v':
+				value = "vertical-tab";
+				break;
+			default:
+				value = val;
+				break;
+		}
+		return "<" + token_name_to_string(name) + ": " + value + ">";
 	}
 };
 

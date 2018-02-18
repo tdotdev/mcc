@@ -189,10 +189,50 @@ token* lexer::lex_floating_point()
 
 token* lexer::lex_character()
 { 
-	character* tok = new character(peek(1));
-	accept(3);
-
-	return tok;
+	accept(1);
+	char c;
+	if (*first == '\\')
+	{
+		accept(1);
+		switch (*first) {
+			case '"':
+				c = '\"';
+				break;
+			case '\'':
+				c = '\'';
+				break;
+			case '\\':
+				c = '\\';
+				break;
+			case 'a':
+				c = '\a';
+				break;
+			case 'b':
+				c = '\b';
+				break;
+			case 'f':
+				c = '\f';
+				break;
+			case 'n':
+				c = '\n';
+				break;
+			case 'r':
+				c = '\r';
+				break;
+			case 't':
+				c = '\t';
+				break;
+			case 'v':
+				c = '\v';
+				break;
+		}
+	}
+	else
+	{
+		c = *first;
+	}
+	accept(2);
+	return new character(c);
 }
 
 token* lexer::lex_escape_sequence(){ return new token(); }
@@ -340,9 +380,6 @@ token* lexer::scan() {
 				return lex_conditional_operator();
 
 			case '\'':
-				if (peek(1) == '\\')
-					return lex_escape_sequence();
-				else
 					return lex_character();
 
 			case '"':
@@ -356,7 +393,7 @@ token* lexer::scan() {
 					return lex_num();
 				
 				std::cout << "INVALID";
-				return new token();
+				accept(1);
 		}
 	}
 }
