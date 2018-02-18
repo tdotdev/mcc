@@ -26,6 +26,20 @@ const char lexer::peek(int n)
 	return *c;
 }
 
+bool lexer::search(char c)
+{
+	assert(!eof());
+	const char* check = first;
+	
+	while (is_digit(*check) || *check == c) {
+		if (*check == c)
+			return true;
+		++check;
+	}
+
+	return false;
+}
+
 bool lexer::eof() 
 {
 	return first == last;
@@ -135,8 +149,12 @@ token* lexer::lex_num()
 		else if (tolower(peek(1)) == 'x')
 			return lex_hexadecimal_integer();
 	}
-	else
-		return lex_decimal_integer();
+	else {
+		if (search('.'))
+			return lex_floating_point();
+		else
+			return lex_decimal_integer();
+	}
 }
 
 token* lexer::lex_binary_integer()
@@ -186,7 +204,17 @@ token* lexer::lex_hexadecimal_integer()
 
 token* lexer::lex_floating_point()
 { 
-	return new token(); 
+	std::string num;
+	double val;
+
+	while (is_digit(*first) || *first == '.') {
+		num += *first;
+		accept(1);
+	}
+
+	val = std::stod(num);
+
+	return new floating_point(val, current);
 }
 
 token* lexer::lex_character()
@@ -296,6 +324,10 @@ token* lexer::scan() {
 				skip_newline();
 				continue;
 
+			case '\t':
+				accept(1);
+				continue;
+
 			case '#':
 				skip_comment();
 				continue;
@@ -386,6 +418,7 @@ token* lexer::scan() {
 
 			case '"':
 				return lex_string();
+
 
 			default:
 				if (is_alpha(*first)) 

@@ -38,6 +38,7 @@ struct lexer {
 	token* scan();
 	const char peek(int n);
 	bool eof();
+	bool search(char);
 
 	bool is_space(const char c);
 	bool is_newline(const char c);

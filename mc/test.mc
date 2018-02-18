@@ -35,5 +35,16 @@ var
 
 integers
 12000
+45.7
 0b00101
 0xaf10
+
+int a = 10;
+char b = 'a';
+
+if(a == b){
+	def var = a;
+}
+else{
+	arr[i] = 0b1111;
+}
