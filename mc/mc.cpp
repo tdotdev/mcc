@@ -2,6 +2,7 @@
 #include <string>
 #include "lexer.hpp"
 #include "token.hpp"
+#include "parser.hpp"
 #include <fstream>
 #include <vector>
 
@@ -28,6 +29,8 @@ int main()
 	for (int i = 0; i < tokens.size(); ++i) {
 		std::cout << tokens[i]->to_string() << "\n";
 	}
+
+	Parser parse();
 	
 	char a;
 	std::cin >> a;

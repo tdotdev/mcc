@@ -217,6 +217,47 @@ token* lexer::lex_floating_point()
 	return new floating_point(val, current);
 }
 
+char lexer::match_escape_sequence(const char escape) 
+{
+	char c;
+
+	switch (escape) 
+	{
+		case '"':
+			c = '\"';
+			break;
+		case '\'':
+			c = '\'';
+			break;
+		case '\\':
+			c = '\\';
+			break;
+		case 'a':
+			c = '\a';
+			break;
+		case 'b':
+			c = '\b';
+			break;
+		case 'f':
+			c = '\f';
+			break;
+		case 'n':
+			c = '\n';
+			break;
+		case 'r':
+			c = '\r';
+			break;
+		case 't':
+			c = '\t';
+			break;
+		case 'v':
+			c = '\v';
+			break;
+	}
+
+	return c;
+}
+
 token* lexer::lex_character()
 { 
 	accept(1);
@@ -224,46 +265,35 @@ token* lexer::lex_character()
 	if (*first == '\\')
 	{
 		accept(1);
-		switch (*first) {
-			case '"':
-				c = '\"';
-				break;
-			case '\'':
-				c = '\'';
-				break;
-			case '\\':
-				c = '\\';
-				break;
-			case 'a':
-				c = '\a';
-				break;
-			case 'b':
-				c = '\b';
-				break;
-			case 'f':
-				c = '\f';
-				break;
-			case 'n':
-				c = '\n';
-				break;
-			case 'r':
-				c = '\r';
-				break;
-			case 't':
-				c = '\t';
-				break;
-			case 'v':
-				c = '\v';
-				break;
-		}
+		c = match_escape_sequence(*first);
 	}
 	else
 	{
 		c = *first;
 	}
 	accept(2);
+
 	return new character(c, current);
 }
+/*
+token* lexer::lex_character()
+{
+	accept(1);
+	char c;
+	if (*first == '\\')
+	{
+		accept(1);
+		c = match_escape_sequence(*first);
+	}
+	else
+	{
+		c = *first;
+	}
+	accept(2);
+
+	return new character(c, current);
+}
+*/
 
 
 token* lexer::lex_string()

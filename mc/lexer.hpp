@@ -39,6 +39,7 @@ struct lexer {
 	const char peek(int n);
 	bool eof();
 	bool search(char);
+	char match_escape_sequence(const char escape);
 
 	bool is_space(const char c);
 	bool is_newline(const char c);
