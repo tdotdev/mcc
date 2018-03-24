@@ -29,8 +29,12 @@ int main()
 	for (int i = 0; i < tokens.size(); ++i) {
 		std::cout << tokens[i]->to_string() << "\n";
 	}
+	
+	std::cout << "PARSING\n";
 
-	Parser parse();
+	Parser parse(tokens);
+
+	parse.parse();
 	
 	char a;
 	std::cin >> a;

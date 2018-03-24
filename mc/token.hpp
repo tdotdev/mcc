@@ -98,9 +98,14 @@ struct token {
 		loc = l;
 	}
 
+	token_name getType() {
+		return name;
+	}
+
 	virtual std::string to_string() {
 		return "<" + token_name_to_string(name) + ">";
 	}
+
 };
 
 struct integer : token {
