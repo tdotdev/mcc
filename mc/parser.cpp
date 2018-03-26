@@ -20,14 +20,15 @@ Parser::Parser(const std::vector<token*>& token_stream)
 token* Parser::lookahead(int n)
 {
 	assert(first < last - 1);
-	std::vector<token*>::const_iterator it;
-	it = first;
+	std::vector<token*>::const_iterator it{ first };
+	//it = first;
 
 	for (int i = 0; i < n; i++)
 	{
 		assert(it < last - 1);
 		++it;
 	}
+
 
 	return *it;
 }
