@@ -43,7 +43,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="test.mc">
+    <None Include="parser_t.mc">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="lexer_t.mc">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

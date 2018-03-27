@@ -68,6 +68,7 @@ enum token_name
 	tok_ts_bool,
 	tok_ts_int,
 	tok_ts_float,
+	tok_ts_void,
 
 	// boolean values
 	tok_false,

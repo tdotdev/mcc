@@ -10,7 +10,7 @@ int main()
 {
 	
 
-	std::ifstream source_file("test.mc");
+	std::ifstream source_file("parser_t.mc");
 	std::string source;
 
 	while (!source_file.eof()) {

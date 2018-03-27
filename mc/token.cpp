@@ -109,6 +109,8 @@ std::string token_name_to_string(token_name name) {
 		return "type-int";
 	case tok_ts_float:
 		return "type-float";
+	case tok_ts_void:
+		return "type-void";
 	case tok_false:
 		return "false";
 	case tok_true:

@@ -15,6 +15,7 @@ struct lexer {
 	std::map<std::string, token_name> reserved{
 		{"and", tok_logical_and},
 		{ "bool", tok_ts_bool},
+		{"void", tok_ts_void},
 		{ "char", tok_ts_char},
 		{ "def", tok_kw_def},
 		{ "else", tok_kw_else},
