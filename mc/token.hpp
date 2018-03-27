@@ -89,6 +89,8 @@ std::string token_name_to_string(token_name);
 std::string radix_to_string(radix);
 
 struct token {
+
+
 	token_name name;
 	location loc;
 
