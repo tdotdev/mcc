@@ -6,38 +6,53 @@
 #include <fstream>
 #include <vector>
 
+void print_token_stream(std::vector<token*>&);
+std::string init_source(std::string);
+
 int main()
 {
-	
-
-	std::ifstream source_file("parser_t.mc");
-	std::string source;
-
-	while (!source_file.eof()) {
-		source += source_file.get();
-	}
+	std::string source{ init_source("parser_t.mc") };
 
 	lexer lex(source);
-
 	std::vector<token*> tokens;
 
 	while(!lex.eof()){
 		tokens.push_back(lex.scan());
 	}
 
-	
-	for (int i = 0; i < tokens.size(); ++i) {
-		std::cout << tokens[i]->to_string() << "\n";
-	}
-	
+	print_token_stream(tokens);
 	std::cout << "PARSING\n";
 
 	Parser parse(tokens);
-
-	parse.parse();
 	
+	parse.parse_decl();
+
+
+
+
 	char a;
 	std::cin >> a;
 
 	return 0;
+}
+
+std::string init_source(std::string fname)
+{
+	std::string source;
+
+	std::ifstream source_file(fname);
+
+	while (!source_file.eof()) {
+		source += source_file.get();
+	}
+
+	return source;
+}
+
+void print_token_stream(std::vector<token*>& tokens)
+{
+	for (auto it = tokens.begin(); it != tokens.end(); ++it)
+	{
+		std::cout << (*it)->to_string() << "\n";
+	}
 }

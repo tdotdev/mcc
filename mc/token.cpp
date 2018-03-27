@@ -49,6 +49,10 @@ std::string token_name_to_string(token_name name) {
 		return "let";
 	case tok_kw_var:
 		return "var";
+	case tok_kw_const:
+		return "const";
+	case tok_kw_volatile:
+		return "volatile";
 	case tok_identifier:
 		return "identifier";
 	case tok_binary_integer:

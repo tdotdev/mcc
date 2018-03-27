@@ -24,6 +24,8 @@ enum token_name
 	tok_kw_if,
 	tok_kw_let,
 	tok_kw_var,
+	tok_kw_const,
+	tok_kw_volatile,
 
 	tok_identifier,
 	tok_binary_integer,

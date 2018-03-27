@@ -17,11 +17,12 @@ struct Parser {
 
 	Parser(const std::vector<token*>& token_stream);
 
+	token_name lookahead();
 	token_name lookahead(int n);
 	
 	void parse();
 	void match(token_name tok);
-	token* accept();
+	void accept();
 	void accept(int n);
 
 
