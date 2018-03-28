@@ -97,7 +97,7 @@ void Parser::parse_postfix_type()
 			return parse_basic_type();
 	}
 
-
+	throw std::runtime_error("Expected postfix type");
 }
 void Parser::parse_reference_type()
 {}
