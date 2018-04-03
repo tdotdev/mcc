@@ -321,7 +321,7 @@ token* lexer::lex_word() {
 		accept(1);
 	}
 
-	std::map<std::string, token_name>::const_iterator got = reserved.find(word);
+	std::unordered_map<std::string, token_name>::const_iterator got = reserved.find(word);
 
 	// symbol not found in table, add it!
 	if (got == reserved.end()) {

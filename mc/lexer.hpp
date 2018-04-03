@@ -7,12 +7,12 @@
 #include <cassert>
 #include <iostream>
 #include <cctype>
-#include <map>
+#include <unordered_map>
 
 
 struct lexer {
 
-	std::map<std::string, token_name> reserved{
+	std::unordered_map<std::string, token_name> reserved{
 		{"and", tok_logical_and},
 		{"const", tok_kw_const},
 		{"volatile", tok_kw_volatile},
