@@ -22,6 +22,7 @@ struct Parser {
 	
 	void parse();
 	void match(token_name tok);
+	void match_if(token_name tok);
 	void accept();
 	void accept(int n);
 

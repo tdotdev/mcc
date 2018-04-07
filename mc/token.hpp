@@ -26,6 +26,11 @@ enum token_name
 	tok_kw_var,
 	tok_kw_const,
 	tok_kw_volatile,
+	tok_kw_while,
+	tok_kw_break,
+	tok_kw_continue,
+	tok_kw_return,
+
 
 	tok_identifier,
 	tok_binary_integer,

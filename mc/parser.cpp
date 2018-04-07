@@ -55,10 +55,19 @@ void Parser::match(token_name tok)
 {
 	if ((*first)->getType() == tok)
 	{
-		++first;
+		accept();
 		return;
 	}
 	throw std::runtime_error("Invalid match");
+}
+
+void Parser::match_if(token_name tok)
+{
+	if ((*first)->getType() == tok)
+	{
+		accept();
+	}
+
 }
 
 void Parser::parse_basic_type()
@@ -180,23 +189,69 @@ void Parser::parse_const_expr()
 void Parser::parse_stmt()
 {}
 void Parser::parse_block_stmt()
-{}
+{
+	match(tok_left_brace);
+	parse_stmt_seq();
+	match(tok_right_brace);
+}
+
 void Parser::parse_stmt_seq()
 {}
+
 void Parser::parse_if_stmt()
-{}
+{
+	match(tok_kw_if);
+	match(tok_left_paren);
+	parse_expr();
+	match(tok_right_paren);
+	parse_stmt();
+	if (lookahead() == tok_kw_else) {
+		match(tok_kw_else);
+		parse_stmt();
+	}
+	
+}
+
 void Parser::parse_while_stmt()
-{}
+{
+	match(tok_kw_while);
+	match(tok_left_paren);
+	parse_expr();
+	match(tok_right_paren);
+	parse_stmt();
+}
+
 void Parser::parse_break_stmt()
-{}
+{
+	match(tok_kw_break);
+	match(tok_semicolon);
+}
+
 void Parser::parse_continue_stmt()
-{}
+{
+	match(tok_kw_continue);
+	match(tok_semicolon);
+}
+
 void Parser::parse_return_stmt()
-{}
+{
+	match(tok_kw_return);
+	if (lookahead() == tok_semicolon)
+		return accept();
+	parse_expr();
+	match(tok_semicolon);
+}
+
+
 void Parser::parse_decl_stmt()
-{}
+{
+	parse_local_decl();
+}
+
 void Parser::parse_expr_stmt()
-{}
+{
+	parse_expr();
+}
 
 
 
