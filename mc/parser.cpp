@@ -187,7 +187,29 @@ void Parser::parse_const_expr()
 }
 
 void Parser::parse_stmt()
-{}
+{
+	switch (lookahead()) {
+		case tok_left_bracket:
+			return parse_block_stmt();
+		case tok_kw_if:
+			return parse_if_stmt();
+		case tok_kw_while:
+			return parse_while_stmt();
+		case tok_kw_break:
+			return parse_break_stmt();
+		case tok_kw_continue:
+			return parse_continue_stmt();
+		case tok_kw_return:
+			return parse_return_stmt();
+		case tok_kw_def:
+		case tok_kw_let:
+		case tok_kw_var:
+			return parse_decl_stmt();	
+	}
+
+	parse_expr_stmt();
+}
+
 void Parser::parse_block_stmt()
 {
 	match(tok_left_brace);
