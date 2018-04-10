@@ -26,7 +26,6 @@ struct Parser {
 	void accept();
 	void accept(int n);
 
-
 	// Types
 	void parse_basic_type();
 	void parse_type_list();
@@ -69,7 +68,6 @@ struct Parser {
 	void parse_expr_stmt();
 
 	// Declarations
-
 	void parse_program();
 	void parse_decl_seq();
 	void parse_decl();
@@ -83,8 +81,4 @@ struct Parser {
 	void parse_param();
 
 
-
 };
-
-
-
