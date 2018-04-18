@@ -15,7 +15,20 @@ punctuators
 {}()[],;:
 
 operators
-==!=<><=>=
+==
+!=
+<>
+<=
+>=
+<<
+>>
++
+-
+*
+/
+|
+&
+^
 
 reserved words
 and

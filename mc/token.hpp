@@ -59,6 +59,10 @@ enum token_name
 	tok_div,
 	tok_rem,
 
+	// shift ops
+	tok_shift_left,
+	tok_shift_right,
+
 	// bitwise ops
 	tok_bitw_and,
 	tok_bitw_or,

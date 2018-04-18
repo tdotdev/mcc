@@ -99,6 +99,10 @@ std::string token_name_to_string(token_name name) {
 		return "arithmetic-div";
 	case tok_rem:
 		return "arithmetic-rem";
+	case tok_shift_right:
+		return "shift-right";
+	case tok_shift_left:
+		return "shift_left";
 	case tok_bitw_and:
 		return "bitwise-and";
 	case tok_bitw_or:

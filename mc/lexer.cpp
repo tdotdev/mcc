@@ -102,7 +102,7 @@ token* lexer::lex_puncuator(token_name name)
 
 token* lexer::lex_relational_operator(token_name op) 
 {
-	if (op == tok_rel_le || op == tok_rel_ge)
+	if (op == tok_rel_le || op == tok_rel_ge || op == tok_rel_eq || op == tok_rel_neq)
 		accept(2);
 	else
 		accept(1);
@@ -115,6 +115,13 @@ token* lexer::lex_arithmetic_operator(token_name op)
 	accept(1);
 	return new token(op, current);
 }
+
+token* lexer::lex_shift_operator(token_name op)
+{
+	accept(2);
+	return new token(op, current);
+}
+
 token* lexer::lex_bitwise_operator(token_name op) 
 {
 	accept(1);
@@ -403,12 +410,16 @@ token* lexer::scan() {
 			case '<':
 				if (peek(1) == '=') 
 					return lex_relational_operator(tok_rel_le);
+				else if (peek(1) == '<')
+					return lex_shift_operator(tok_shift_left);
 				else 
 					return lex_relational_operator(tok_rel_lt);
 
 			case '>':
 				if (peek(1) == '=') 
 					return lex_relational_operator(tok_rel_ge);
+				else if (peek(1) == '>')
+					return lex_shift_operator(tok_shift_right);
 				else 
 					return lex_relational_operator(tok_rel_gt);
 

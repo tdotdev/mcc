@@ -151,29 +151,186 @@ void Parser::parse_mul_expr()
 {}
 void Parser::parse_add_expr()
 {}
+
+bool Parser::match_if_shift_expr()
+{
+	/*
+	switch (lookahead()) {
+		case tok_
+	}
+	*/
+
+	return false;
+}
+
 void Parser::parse_shift_expr()
-{}
+{
+	parse_add_expr();
+	while (match_if_shift_expr())
+	{
+		parse_add_expr();
+	}
+}
+
+bool Parser::match_if_rel_expr()
+{
+	switch (lookahead()) {
+		case tok_rel_lt:
+		case tok_rel_gt:
+		case tok_rel_le:
+		case tok_rel_ge:
+			accept();
+			return true;
+		default:
+			return false;
+	}
+}
+
 void Parser::parse_rel_expr()
-{}
+{
+	parse_shift_expr();
+
+	while (match_if_rel_expr())
+		parse_shift_expr();
+}
+
+bool Parser::match_if_eq_expr()
+{
+	switch (lookahead()) {
+		case tok_rel_eq:
+		case tok_rel_neq:
+			accept();
+			return true;
+		default:
+			return false;
+	}
+}
+
 void Parser::parse_eq_expr()
-{}
+{
+	parse_rel_expr();
+
+	while (match_if_eq_expr())
+		parse_rel_expr();
+}
+
+bool Parser::match_if_bw_and_expr()
+{
+	if (lookahead() == tok_bitw_and)
+	{
+		accept();
+		return true;
+	}
+
+	return false;
+}
+
 void Parser::parse_bw_and_expr()
-{}
+{
+	parse_eq_expr();
+
+	while (match_if_bw_and_expr())
+		parse_eq_expr();
+}
+
+
+bool Parser::match_if_bw_xor_expr()
+{
+	if (lookahead() == tok_bitw_xor) {
+		accept();
+		return true;
+	}
+
+	return false;
+}
+
 void Parser::parse_bw_xor_expr()
-{}
+{
+	parse_bw_and_expr();
+
+	while (match_if_bw_xor_expr())
+		parse_bw_and_expr();
+}
+
+bool Parser::match_if_bw_or_expr()
+{
+	if (lookahead() == tok_bitw_or) 
+	{
+		accept();
+		return true;
+	}
+
+	return false;
+}
+
 void Parser::parse_bw_or_expr()
-{}
+{
+	parse_bw_xor_expr();
+
+	while (match_if_bw_or_expr())
+		parse_bw_xor_expr();
+}
+
+bool Parser::match_if_logical_and_expr()
+{
+	if (lookahead() == tok_logical_and) 
+	{
+		accept();
+		return true;
+	}
+
+	return false;
+}
+
 void Parser::parse_logical_and_expr()
-{}
+{
+	parse_bw_or_expr();
+
+	while (match_if_logical_and_expr())
+		parse_bw_or_expr();
+}
+
+bool Parser::match_if_logical_or_expr()
+{
+	if (lookahead() == tok_logical_or) 
+	{
+		accept();
+		return true;
+	}
+
+	return false;
+}
+
 void Parser::parse_logical_or_expr()
-{}
+{
+	parse_logical_and_expr();
+
+	while (match_if_logical_or_expr())
+		parse_logical_and_expr();
+}
+
 void Parser::parse_conditional_expr()
-{}
+{
+	parse_logical_or_expr();
+
+	if (lookahead() == tok_conditional_operator)
+	{
+		accept();
+		parse_expr();
+		match(tok_colon);
+		parse_conditional_expr();
+	}
+}
+
 void Parser::parse_assign_expr()
 {
 	parse_conditional_expr();
-	match(tok_assignment_operator);
-	
+
+	if (lookahead() == tok_assignment_operator)
+	{
+		accept();
+		parse_assign_expr();
+	}
 }
 
 void Parser::parse_expr()

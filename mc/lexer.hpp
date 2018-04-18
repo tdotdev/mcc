@@ -63,6 +63,7 @@ struct lexer {
 	token* lex_puncuator(token_name);
 	token* lex_relational_operator(token_name);
 	token* lex_arithmetic_operator(token_name);
+	token* lex_shift_operator(token_name);
 	token* lex_bitwise_operator(token_name);
 	token* lex_logical_operator(token_name);
 	token* lex_conditional_operator();
