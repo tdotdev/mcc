@@ -20,7 +20,7 @@ struct Parser {
 	token_name lookahead();
 	token_name lookahead(int n);
 	
-	void parse();
+
 	void match(token_name tok);
 	void match_if(token_name tok);
 	void accept();

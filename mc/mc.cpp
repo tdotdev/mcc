@@ -20,16 +20,13 @@ int main()
 		tokens.push_back(lex.scan());
 	}
 
-	print_token_stream(tokens);
-	std::cout << "PARSING\n";
+	//print_token_stream(tokens);
 
 	Parser parse(tokens);
-	
 	parse.parse_program();
 
 
-	std::cout << "GREAT SUCCESS!";
-
+	std::cout << "End.\n";
 	char a;
 	std::cin >> a;
 

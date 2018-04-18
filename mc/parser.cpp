@@ -46,12 +46,6 @@ void Parser::accept(int n)
 	}
 }
 
-
-void Parser::parse()
-{
-	
-}
-
 void Parser::match(token_name tok)
 {
 	if ((*first)->getType() == tok)
@@ -88,6 +82,7 @@ void Parser::parse_basic_type()
 }
 void Parser::parse_type_list()
 {}
+
 void Parser::parse_postfix_type()
 {
 	switch (lookahead())
@@ -109,11 +104,17 @@ void Parser::parse_postfix_type()
 
 	throw std::runtime_error("Expected postfix type");
 }
+
+
 void Parser::parse_reference_type()
-{}
-void Parser::parse_type()
 {
 	parse_postfix_type();
+	match_if(tok_bitw_and);
+}
+
+void Parser::parse_type()
+{
+	parse_reference_type();
 }
 
 void Parser::parse_primary_expr()
@@ -427,8 +428,6 @@ void Parser::parse_conditional_expr()
 		parse_conditional_expr();
 
 	}
-
-
 }
 
 void Parser::parse_assign_expr()
@@ -558,7 +557,6 @@ void Parser::parse_return_stmt()
 	match(tok_semicolon);
 }
 
-
 void Parser::parse_decl_stmt()
 {
 	parse_local_decl();
@@ -569,8 +567,6 @@ void Parser::parse_expr_stmt()
 	parse_expr();
 	match(tok_semicolon);
 }
-
-
 
 void Parser::parse_program()
 {
@@ -612,6 +608,7 @@ void Parser::parse_local_decl()
 {
 	parse_obj_def();
 }
+
 void Parser::parse_obj_def()
 {
 	switch (lookahead())
@@ -626,6 +623,7 @@ void Parser::parse_obj_def()
 
 	throw std::runtime_error("Expected onject definition");
 }
+
 void Parser::parse_var_def()
 {
 	match(tok_kw_var);
