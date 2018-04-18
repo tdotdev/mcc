@@ -138,13 +138,48 @@ void Parser::parse_primary_expr()
 
 	throw std::runtime_error("Expected primary expression");
 }
+
+bool Parser::match_if_postfix_expr()
+{
+	switch (lookahead()) 
+	{
+		case tok_left_paren:
+		case tok_left_bracket:
+			accept();
+			return true;
+	}
+
+	return false;
+}
+
 void Parser::parse_postfix_expr()
 {
 	parse_primary_expr();
+
+	while (match_if_postfix_expr())
+	{
+		parse_arg_list();
+		accept();
+	}
+}
+
+bool Parser::match_if_arg_list()
+{
+	if (lookahead() == tok_comma)
+	{
+		accept();
+		return true;
+	}
+
+	return false;
 }
 
 void Parser::parse_arg_list()
-{}
+{
+	parse_arg();
+	while (match_if_arg_list())
+		parse_arg();
+}
 
 
 void Parser::parse_arg()
@@ -390,7 +425,10 @@ void Parser::parse_conditional_expr()
 		parse_expr();
 		match(tok_colon);
 		parse_conditional_expr();
+
 	}
+
+
 }
 
 void Parser::parse_assign_expr()
@@ -400,8 +438,10 @@ void Parser::parse_assign_expr()
 	if (lookahead() == tok_assignment_operator)
 	{
 		accept();
-		parse_assign_expr();
+		parse_assign_expr(); 
+		return;
 	}
+
 }
 
 void Parser::parse_expr()
@@ -446,8 +486,32 @@ void Parser::parse_block_stmt()
 	match(tok_right_brace);
 }
 
+bool Parser::match_if_stmt_seq()
+{
+	switch (lookahead())
+	{
+		case tok_kw_if:
+		case tok_left_bracket:
+		case tok_kw_while:
+		case tok_kw_break:
+		case tok_kw_continue:
+		case tok_kw_return:
+		case tok_kw_def:
+		case tok_kw_let:
+		case tok_kw_var:
+		case tok_identifier:
+			return true;
+	}
+
+	return false;
+}
+
 void Parser::parse_stmt_seq()
-{}
+{
+	parse_stmt();
+	while (match_if_stmt_seq())
+		parse_stmt();
+}
 
 void Parser::parse_if_stmt()
 {
@@ -503,6 +567,7 @@ void Parser::parse_decl_stmt()
 void Parser::parse_expr_stmt()
 {
 	parse_expr();
+	match(tok_semicolon);
 }
 
 
@@ -511,9 +576,16 @@ void Parser::parse_program()
 {
 	parse_decl_seq();
 }
+
+bool Parser::match_if_decl_seq()
+{
+	return false;
+}
+
 void Parser::parse_decl_seq()
 {
-
+	while(first != last)
+		parse_decl();
 }
 
 void Parser::parse_decl()
@@ -602,17 +674,30 @@ void Parser::parse_func_def()
 	match(tok_identifier);
 	match(tok_left_paren);
 	parse_param_list();
+	match(tok_right_paren);
 	match(tok_sub);
 	match(tok_rel_gt);
 	parse_type();
 	parse_block_stmt();
 }
 
+bool Parser::match_if_param_list()
+{
+	if (lookahead() == tok_comma) 
+	{
+		accept();
+		return true;
+	}
 
+	return false;
+}
 
 void Parser::parse_param_list()
 {
+	parse_param();
 
+	while (match_if_param_list())
+		parse_param();
 }
 
 void Parser::parse_param()

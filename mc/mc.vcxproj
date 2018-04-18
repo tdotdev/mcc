@@ -123,6 +123,7 @@
     <ClInclude Include="token.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="func_call.mc" />
     <None Include="parser_t.mc" />
     <None Include="lexer_t.mc" />
   </ItemGroup>

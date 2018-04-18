@@ -35,42 +35,33 @@ struct Parser {
 
 	// Expressions
 	void parse_primary_expr();
+	bool match_if_postfix_expr();
 	void parse_postfix_expr();
+	bool match_if_arg_list();
 	void parse_arg_list();
 	void parse_arg();
 	void parse_unary_expr();
 	void parse_cast_expr();
-
 	bool match_if_mul_expr();
 	void parse_mul_expr();
-
 	bool match_if_add_expr();
 	void parse_add_expr();
-
 	bool match_if_shift_expr();
 	void parse_shift_expr();
-
 	bool match_if_rel_expr();
 	void parse_rel_expr();
-
 	bool match_if_eq_expr();
 	void parse_eq_expr();
-
 	bool match_if_bw_and_expr();
 	void parse_bw_and_expr();
-
 	bool match_if_bw_xor_expr();
 	void parse_bw_xor_expr();
-
 	bool match_if_bw_or_expr();
 	void parse_bw_or_expr();
-
 	bool match_if_logical_and_expr();
 	void parse_logical_and_expr();
-
 	bool match_if_logical_or_expr();
 	void parse_logical_or_expr();
-
 	void parse_conditional_expr();
 	void parse_assign_expr();
 	void parse_expr();
@@ -79,6 +70,7 @@ struct Parser {
 	// Statements
 	void parse_stmt();
 	void parse_block_stmt();
+	bool match_if_stmt_seq();
 	void parse_stmt_seq();
 	void parse_if_stmt();
 	void parse_while_stmt();
@@ -90,6 +82,7 @@ struct Parser {
 
 	// Declarations
 	void parse_program();
+	bool match_if_decl_seq();
 	void parse_decl_seq();
 	void parse_decl();
 	void parse_local_decl();
@@ -98,6 +91,7 @@ struct Parser {
 	void parse_const_def();
 	void parse_val_def();
 	void parse_func_def();
+	bool match_if_param_list();
 	void parse_param_list();
 	void parse_param();
 

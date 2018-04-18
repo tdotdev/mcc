@@ -156,12 +156,11 @@ token* lexer::lex_num()
 		else if (tolower(peek(1)) == 'x')
 			return lex_hexadecimal_integer();
 	}
-	else {
-		if (search('.'))
-			return lex_floating_point();
-		else
-			return lex_decimal_integer();
-	}
+
+	if (search('.'))
+		return lex_floating_point();
+	else
+		return lex_decimal_integer();
 }
 
 token* lexer::lex_binary_integer()

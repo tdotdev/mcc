@@ -49,5 +49,8 @@
     <None Include="lexer_t.mc">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="func_call.mc">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

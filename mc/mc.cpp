@@ -25,10 +25,10 @@ int main()
 
 	Parser parse(tokens);
 	
-	parse.parse_stmt();
+	parse.parse_program();
 
 
-
+	std::cout << "GREAT SUCCESS!";
 
 	char a;
 	std::cin >> a;
