@@ -34,6 +34,7 @@ struct lexer {
 		{ "or", tok_logical_or},
 		{ "true", tok_true},
 		{ "var", tok_kw_var},
+		{ "as", tok_kw_as },
 	};
 
 	const char* first;

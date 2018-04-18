@@ -138,27 +138,94 @@ void Parser::parse_primary_expr()
 	throw std::runtime_error("Expected primary expression");
 }
 void Parser::parse_postfix_expr()
-{}
+{
+	parse_primary_expr();
+}
+
 void Parser::parse_arg_list()
 {}
+
+
 void Parser::parse_arg()
-{}
+{
+	parse_expr();
+}
+
 void Parser::parse_unary_expr()
-{}
+{
+	switch (lookahead())
+	{
+		case tok_add:
+		case tok_sub:
+		case tok_bitw_not:
+		case tok_logical_not:
+		case tok_logical_and:
+		case tok_mul:
+			accept();
+			parse_unary_expr();
+		default:
+			parse_postfix_expr();
+	}
+}
+
+
+// fix me!!
 void Parser::parse_cast_expr()
-{}
+{
+	parse_unary_expr();
+}
+
+bool Parser::match_if_mul_expr()
+{
+	switch (lookahead()) 
+	{
+		case tok_mul:
+		case tok_div:
+		case tok_rem:
+			accept();
+			return true;
+	}
+
+	return false;
+}
+
 void Parser::parse_mul_expr()
-{}
+{
+	parse_cast_expr();
+
+	while (match_if_mul_expr())
+		parse_cast_expr();
+}
+
+bool Parser::match_if_add_expr()
+{
+	switch (lookahead()) {
+		case tok_add:
+		case tok_sub:
+			accept();
+			return true;
+		default:
+			return false;
+	}
+}
+
 void Parser::parse_add_expr()
-{}
+{
+	parse_mul_expr();
+
+	while (match_if_add_expr())
+		parse_mul_expr();
+}
 
 bool Parser::match_if_shift_expr()
 {
-	/*
-	switch (lookahead()) {
-		case tok_
+	switch (lookahead()) 
+	{
+		case tok_shift_left:
+		case tok_shift_right:
+			accept();
+			return true;
 	}
-	*/
 
 	return false;
 }
@@ -174,16 +241,17 @@ void Parser::parse_shift_expr()
 
 bool Parser::match_if_rel_expr()
 {
-	switch (lookahead()) {
+	switch (lookahead()) 
+	{
 		case tok_rel_lt:
 		case tok_rel_gt:
 		case tok_rel_le:
 		case tok_rel_ge:
 			accept();
 			return true;
-		default:
-			return false;
 	}
+
+	return false;
 }
 
 void Parser::parse_rel_expr()
@@ -196,14 +264,15 @@ void Parser::parse_rel_expr()
 
 bool Parser::match_if_eq_expr()
 {
-	switch (lookahead()) {
+	switch (lookahead()) 
+	{
 		case tok_rel_eq:
 		case tok_rel_neq:
 			accept();
 			return true;
-		default:
-			return false;
 	}
+
+	return false;
 }
 
 void Parser::parse_eq_expr()
@@ -236,7 +305,8 @@ void Parser::parse_bw_and_expr()
 
 bool Parser::match_if_bw_xor_expr()
 {
-	if (lookahead() == tok_bitw_xor) {
+	if (lookahead() == tok_bitw_xor) 
+	{
 		accept();
 		return true;
 	}
@@ -345,7 +415,8 @@ void Parser::parse_const_expr()
 
 void Parser::parse_stmt()
 {
-	switch (lookahead()) {
+	switch (lookahead()) 
+	{
 		case tok_left_bracket:
 			return parse_block_stmt();
 		case tok_kw_if:
@@ -384,7 +455,8 @@ void Parser::parse_if_stmt()
 	parse_expr();
 	match(tok_right_paren);
 	parse_stmt();
-	if (lookahead() == tok_kw_else) {
+	if (lookahead() == tok_kw_else) 
+	{
 		match(tok_kw_else);
 		parse_stmt();
 	}
@@ -456,10 +528,8 @@ void Parser::parse_decl()
 				return parse_func_def();
 		}
 		case tok_kw_let:
-		case tok_kw_var: 
-		{
+		case tok_kw_var:
 			return parse_obj_def();
-		}
 	}
 
 	throw std::runtime_error("Expected declaration");
@@ -490,7 +560,8 @@ void Parser::parse_var_def()
 	match(tok_colon);
 	parse_type();
 
-	switch (lookahead()) {
+	switch (lookahead()) 
+	{
 		case tok_semicolon:
 			return match(tok_semicolon);
 		case tok_assignment_operator:
@@ -498,6 +569,7 @@ void Parser::parse_var_def()
 			parse_expr();
 			return match(tok_semicolon);
 	}
+
 	throw std::runtime_error("Expected variable definition");
 }
 
@@ -511,6 +583,7 @@ void Parser::parse_const_def()
 	parse_expr();
 	match(tok_semicolon);
 }
+
 void Parser::parse_val_def()
 {
 	match(tok_kw_def);
@@ -521,6 +594,7 @@ void Parser::parse_val_def()
 	parse_expr();
 	match(tok_semicolon);
 }
+
 void Parser::parse_func_def()
 {
 	match(tok_kw_def);
@@ -532,6 +606,7 @@ void Parser::parse_func_def()
 	parse_type();
 	parse_block_stmt();
 }
+
 void Parser::parse_param_list()
 {}
 void Parser::parse_param()

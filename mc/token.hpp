@@ -30,6 +30,7 @@ enum token_name
 	tok_kw_break,
 	tok_kw_continue,
 	tok_kw_return,
+	tok_kw_as,
 
 
 	tok_identifier,

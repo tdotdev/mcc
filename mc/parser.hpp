@@ -40,7 +40,11 @@ struct Parser {
 	void parse_arg();
 	void parse_unary_expr();
 	void parse_cast_expr();
+
+	bool match_if_mul_expr();
 	void parse_mul_expr();
+
+	bool match_if_add_expr();
 	void parse_add_expr();
 
 	bool match_if_shift_expr();
