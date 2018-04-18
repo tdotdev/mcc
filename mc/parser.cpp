@@ -18,6 +18,7 @@ Parser::Parser(const std::vector<token*>& token_stream)
 }
 
 token_name Parser::lookahead() {
+	assert(first != last);
 	return (*first)->getType();
 }
 
@@ -607,8 +608,13 @@ void Parser::parse_func_def()
 	parse_block_stmt();
 }
 
+
+
 void Parser::parse_param_list()
-{}
+{
+
+}
+
 void Parser::parse_param()
 {
 	match(tok_identifier);
