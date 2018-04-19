@@ -11,6 +11,7 @@ def main(a : int, b : float) -> int
 	alloc(alloc(x));
 	x = a + b;
 	a + b;
+	10 + 10;
 	y = b - a;
 	return a;
 	a << b;

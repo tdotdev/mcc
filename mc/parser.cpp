@@ -519,6 +519,11 @@ bool Parser::match_if_stmt_seq()
 		case tok_kw_let:
 		case tok_kw_var:
 		case tok_identifier:
+		case tok_decimal_integer:
+		case tok_binary_integer:
+		case tok_hexadecimal_integer:
+		case tok_character:
+		case tok_boolean:
 			return true;
 	}
 
