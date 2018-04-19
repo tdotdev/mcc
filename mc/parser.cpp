@@ -112,7 +112,9 @@ void Parser::parse_postfix_type()
 void Parser::parse_reference_type()
 {
 	parse_postfix_type();
-	match_if(tok_bitw_and);
+	while (lookahead() == tok_bitw_and)
+		accept();
+
 }
 
 void Parser::parse_type()

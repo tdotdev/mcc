@@ -1,5 +1,7 @@
 #Parser Test program
 
+var z : int = 5 + 5 + 5 + 5 + 5 + 5 * 5;
+
 var x : int = 0;
 var y : float = 3;
 let HELLO : char = 'a';
