@@ -122,6 +122,7 @@
     <ClInclude Include="location.hpp" />
     <ClInclude Include="node.hpp" />
     <ClInclude Include="parser.hpp" />
+    <ClInclude Include="scope.hpp" />
     <ClInclude Include="token.hpp" />
   </ItemGroup>
   <ItemGroup>

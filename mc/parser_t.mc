@@ -11,6 +11,13 @@ def main(a : int, b : float) -> int
 	a + b;
 	y = b - a;
 	return a;
+	a << b;
+	b >> a;
+	1000 != 2000;
+	if(x == 0)
+	{
+		x = x + 1;
+	}
 }
 
 def alloc(a : float) -> char

@@ -18,8 +18,11 @@ Parser::Parser(const std::vector<token*>& token_stream)
 }
 
 token_name Parser::lookahead() {
-	assert(first != last);
-	return (*first)->getType();
+
+	if(first != last)
+		return (*first)->getType();
+
+	return tok_eof;
 }
 
 token_name Parser::lookahead(int n)
@@ -457,7 +460,7 @@ void Parser::parse_stmt()
 {
 	switch (lookahead()) 
 	{
-		case tok_left_bracket:
+		case tok_left_brace:
 			return parse_block_stmt();
 		case tok_kw_if:
 			return parse_if_stmt();
