@@ -41,6 +41,7 @@ struct Parser {
 	void parse_arg_list();
 	void parse_arg();
 	void parse_unary_expr();
+	bool match_if_cast_expr();
 	void parse_cast_expr();
 	bool match_if_mul_expr();
 	void parse_mul_expr();

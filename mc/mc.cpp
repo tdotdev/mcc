@@ -23,7 +23,7 @@ int main()
 	//print_token_stream(tokens);
 
 	Parser parse(tokens);
-	parse.parse_stmt_seq();
+	parse.parse_decl_seq();
 
 
 	std::cout << "End.\n";

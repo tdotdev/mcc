@@ -208,11 +208,26 @@ void Parser::parse_unary_expr()
 	}
 }
 
+bool  Parser::match_if_cast_expr()
+{
+	if (lookahead() == tok_kw_as)
+	{
+		accept();
+		parse_type();
+		return true;
+	}
+
+	return false;
+}
 
 // fix me!!
 void Parser::parse_cast_expr()
 {
 	parse_unary_expr();
+	while (lookahead() == tok_kw_as) {
+		accept();
+		parse_type();
+	}
 }
 
 bool Parser::match_if_mul_expr()
