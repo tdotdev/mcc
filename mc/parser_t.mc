@@ -6,12 +6,13 @@ var x : int = 0;
 var y : float = 3;
 let HELLO : char = 'a';
 
+var z : int& = g;
+
 def main(a : int, b : float) -> int
 {
 	alloc(alloc(x));
 	x = a + b;
 	a + b;
-	10 + 10;
 	y = b - a;
 	return a;
 	a << b;

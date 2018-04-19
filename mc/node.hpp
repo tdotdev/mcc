@@ -3,3 +3,8 @@
 class Node {
 	
 };
+
+class ExprNode : Node {
+
+};
+
