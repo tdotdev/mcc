@@ -2,6 +2,7 @@
 
 #include "token.hpp"
 #include "location.hpp"
+#include "semantics.hpp"
 #include <vector>
 #include <cassert>
 #include <iostream>
@@ -96,5 +97,5 @@ struct Parser {
 	void parse_param_list();
 	void parse_param();
 
-
+	Semantics sem;
 };

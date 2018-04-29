@@ -41,13 +41,16 @@
     <ClInclude Include="parser.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ast.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="node.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="scope.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="expression.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="semantics.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

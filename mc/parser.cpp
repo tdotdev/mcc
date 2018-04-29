@@ -17,7 +17,7 @@ Parser::Parser(const std::vector<token*>& token_stream)
 	
 }
 
-token_name Parser::lookahead() {
+inline token_name Parser::lookahead() {
 
 	if(first != last)
 		return (*first)->getType();
@@ -25,7 +25,7 @@ token_name Parser::lookahead() {
 	return tok_eof;
 }
 
-token_name Parser::lookahead(int n)
+inline token_name Parser::lookahead(int n)
 {
 	std::vector<token*>::const_iterator it{ first };
 
@@ -34,13 +34,13 @@ token_name Parser::lookahead(int n)
 	return (*it)->getType();
 }
 
-void Parser::accept()
+inline void Parser::accept()
 {
 		assert(first != last);
 		++first;
 }
 
-void Parser::accept(int n)
+inline void Parser::accept(int n)
 {
 	for (int i = 0; i < n; i++)
 	{
@@ -49,7 +49,7 @@ void Parser::accept(int n)
 	}
 }
 
-void Parser::match(token_name tok)
+inline void Parser::match(token_name tok)
 {
 	if ((*first)->getType() == tok)
 	{
@@ -59,7 +59,7 @@ void Parser::match(token_name tok)
 	throw std::runtime_error("Invalid match");
 }
 
-void Parser::match_if(token_name tok)
+inline void Parser::match_if(token_name tok)
 {
 	if ((*first)->getType() == tok)
 	{
@@ -165,8 +165,10 @@ void Parser::parse_postfix_expr()
 	while (match_if_postfix_expr())
 	{
 		parse_arg_list();
-		accept();
+		return accept();
 	}
+
+
 }
 
 bool Parser::match_if_arg_list()
@@ -222,7 +224,7 @@ bool  Parser::match_if_cast_expr()
 	return false;
 }
 
-// fix me!!
+
 void Parser::parse_cast_expr()
 {
 	parse_unary_expr();
@@ -446,7 +448,6 @@ void Parser::parse_conditional_expr()
 		parse_expr();
 		match(tok_colon);
 		parse_conditional_expr();
-
 	}
 }
 
