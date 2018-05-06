@@ -11,7 +11,7 @@ std::string init_source(std::string);
 
 int main()
 {
-	std::string source{ init_source("parser_t2.mc") };
+	std::string source{ init_source("parser_t.mc") };
 
 	lexer lexer(source);
 	std::vector<token*> tokens;

@@ -39,3 +39,34 @@ stmt* Semantics::new_expr_stmt(expr* expression)
 {
 	return new expr_stmt(expression);
 }
+
+
+type* Semantics::new_void_type()
+{
+	return new void_type(void_t);
+}
+
+type* Semantics::new_bool_type()
+{
+	return new bool_type(bool_t);
+}
+
+type* Semantics::new_int_type()
+{
+	return new int_type(int_t);
+}
+
+type* Semantics::new_float_type()
+{
+	return new float_type(mfloat_t);
+}
+
+type* Semantics::new_char_type()
+{
+	return new char_type(char_t);
+}
+
+type* Semantics::new_func_type(std::vector<type*> params, type_t ret_type)
+{
+	return new function_type(params, ret_type);
+}

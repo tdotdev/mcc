@@ -34,7 +34,8 @@ struct Parser
 	type* parse_basic_type();
 	type* parse_postfix_type();
 	type* parse_reference_type();
-	type* parse_type();
+	type* parse_type(); 
+	//token* match_if_postfix_type();
 
 	// Expressions
 	expr* parse_primary_expr();
@@ -84,7 +85,7 @@ struct Parser
 	token* is_stmt();
 
 	// Declarations
-	decl* parse_program();
+	std::vector<decl*>* parse_program();
 	std::vector<decl*> parse_decl_seq();
 	decl* parse_decl();
 	decl* parse_local_decl();

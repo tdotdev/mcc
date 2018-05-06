@@ -12,6 +12,7 @@ def main(a : int, b : float) -> int
 {
 	alloc(alloc(x));
 	x = a + b;
+	var x : int = 0;
 	a + b;
 	y = b - a;
 	return a;

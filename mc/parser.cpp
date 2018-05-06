@@ -61,32 +61,89 @@ inline void Parser::match_if(token_name tok)
 	throw std::runtime_error("Invalid match");
 }
 
+/*	TYPE PARSING	*/
+
 type* Parser::parse_basic_type()
 {
 
 	switch (lookahead())
 	{
 		case tok_ts_void:
+			accept();
+			return semantics.new_void_type();
 		case tok_ts_bool:
+			accept();
+			return semantics.new_bool_type();
 		case tok_ts_int:
+			accept();
+			return semantics.new_int_type();
 		case tok_ts_float:
+			accept();
+			return semantics.new_float_type();
 		case tok_ts_char: 
 			accept();
-			return new type;
+			return semantics.new_char_type();
 	}
 
 	throw std::runtime_error("Expected basic-type");
 }
 
-type* Parser::parse_postfix_type()
+/*
+token* Parser::match_if_postfix_type()
 {
 	switch (lookahead())
 	{
 		case tok_mul:
+		{
+			return accept();
+		}
+		case tok_kw_const:
+		{
+			return accept();
+		}
+		case tok_kw_volatile:
+		{
+			return accept();
+		}
+		case tok_left_bracket:
+		{
+			match(tok_left_bracket);
+			if (lookahead() != tok_right_brace)
+			{
+				expr* e = parse_expr();
+			}
+			match(tok_right_brace);
+			return accept();
+		}
+	}
+
+	return nullptr;
+}
+*/
+
+type* Parser::parse_postfix_type()
+{
+	/*
+	type* basic_type = parse_basic_type();
+	while (match_if_postfix_type())
+	{
+		continue;
+	}
+	*/
+	
+	switch (lookahead(1))
+	{
+		case tok_mul:
+		{
+			accept();
+			return nullptr;
+		}
 		case tok_kw_const:
 		case tok_kw_volatile:
+		{
 			accept();
-			return new type;
+			return nullptr;
+		}
 
 		case tok_left_bracket:
 			match(tok_left_bracket);
@@ -95,12 +152,14 @@ type* Parser::parse_postfix_type()
 				expr* e = parse_expr();
 			}
 			match(tok_right_brace);
-			return new type;
+			return nullptr;
 
 		default:
-			type* basic_type = parse_basic_type();
-			return new type;
+		{
+			return parse_basic_type();
+		}
 	}
+	
 
 	throw std::runtime_error("Expected postfix type");
 }
@@ -114,15 +173,17 @@ type* Parser::parse_reference_type()
 		accept();
 	}
 
-	return new type;
+	return post_type;
 }
 
 type* Parser::parse_type()
 {
 	type* ref_type = parse_reference_type();
 
-	return new type;
+	return ref_type;
 }
+
+/*	EXPRESSION PARSING	*/
 
 expr* Parser::parse_primary_expr()
 {
@@ -521,6 +582,8 @@ expr* Parser::parse_const_expr()
 	return new expr;
 }
 
+/*	STATEMENT PARSING	*/
+
 stmt* Parser::parse_stmt()
 {
 	switch (lookahead()) 
@@ -702,11 +765,13 @@ stmt* Parser::parse_expr_stmt()
 	return semantics.new_expr_stmt(e);
 }
 
-decl* Parser::parse_program()
-{
-	std::vector<decl*> decl_seq = parse_decl_seq();
+/*	DECLARATION PARSING	*/
 
-	return new decl;
+std::vector<decl*>* Parser::parse_program()
+{
+	std::vector<decl*>* program = &parse_decl_seq();
+	
+	return program;
 }
 
 std::vector<decl*> Parser::parse_decl_seq()

@@ -4,6 +4,7 @@
 #include "expression.hpp"
 #include "statement.hpp"
 #include "declaration.hpp"
+#include "type.hpp"
 
 
 struct Semantics {
@@ -17,5 +18,12 @@ struct Semantics {
 	stmt* new_decl_stmt(decl* declaration);
 	stmt* new_expr_stmt(expr* expression);
 
+	type* new_void_type();
+	type* new_bool_type();
+	type* new_int_type();
+	type* new_float_type();
+	type* new_char_type();
+
+	type* new_func_type(std::vector<type*> params, type_t ret_type);
 
 };
