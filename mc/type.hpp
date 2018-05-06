@@ -1,6 +1,5 @@
+#pragma once
 
-
-class type {
-
+struct type {
 
 };

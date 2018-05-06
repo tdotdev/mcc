@@ -9,7 +9,6 @@
 #include <cctype>
 #include <unordered_map>
 
-
 struct lexer {
 
 	std::unordered_map<std::string, token_name> reserved{
@@ -75,5 +74,4 @@ struct lexer {
 	token* lex_floating_point();
 	token* lex_character();
 	token* lex_string();
-
 };

@@ -41,9 +41,6 @@
     <ClInclude Include="parser.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="node.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="scope.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -42,15 +42,6 @@ inline token* Parser::accept()
 		return current;
 }
 
-inline void Parser::accept(int n)
-{
-	for (int i = 0; i < n; i++)
-	{
-		assert(first != last);
-		++first;
-	}
-}
-
 inline void Parser::match(token_name tok)
 {
 	if ((*first)->getType() == tok)
@@ -67,7 +58,7 @@ inline void Parser::match_if(token_name tok)
 	{
 		accept();
 	}
-
+	throw std::runtime_error("Invalid match");
 }
 
 type* Parser::parse_basic_type()
@@ -589,7 +580,7 @@ stmt* Parser::parse_block_stmt()
 
 
 /* This may be buggy vvvv*/
-token*Parser::match_if_stmt_seq()
+token*Parser::is_stmt()
 {
 	switch (lookahead())
 	{
@@ -621,7 +612,7 @@ std::vector<stmt*> Parser::parse_stmt_seq()
 	stmt* s = parse_stmt();
 	stmt_seq.push_back(s);
 
-	while (match_if_stmt_seq())
+	while (is_stmt())
 	{
 		stmt* s_more = parse_stmt();
 		stmt_seq.push_back(s_more);

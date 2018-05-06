@@ -1,6 +1,5 @@
 #pragma once
 
-
-class Semantics {
+struct Semantics {
 
 };

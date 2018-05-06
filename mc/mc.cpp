@@ -23,12 +23,12 @@ int main()
 			tokens.push_back(tok);
 	}
 
-	//print_token_stream(tokens);
+	print_token_stream(tokens);
 
 	Parser parser(tokens);
 	parser.parse_program();
 
-	std::cout << "Wow, it didn't break!\n";
+	std::cout << "Nice.\n";
 	char a;
 	std::cin >> a;
 
@@ -50,8 +50,8 @@ std::string init_source(std::string fname)
 
 void print_token_stream(std::vector<token*>& tokens)
 {
-	for (auto it = tokens.begin(); it != tokens.end(); ++it)
+	for (const auto tok : tokens)
 	{
-		std::cout << (*it)->to_string() << "\n";
+		std::cout << tok->to_string() << "\n";
 	}
 }

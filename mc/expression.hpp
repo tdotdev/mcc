@@ -27,7 +27,6 @@ enum binary_op {
 
 	bop_land,
 	bop_lor,
-
 };
 
 struct binary_expr : expr {
