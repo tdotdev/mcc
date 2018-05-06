@@ -34,10 +34,12 @@ inline token_name Parser::lookahead(int n)
 	return (*it)->getType();
 }
 
-inline void Parser::accept()
+inline token* Parser::accept()
 {
 		assert(first != last);
+		token* current = *first;
 		++first;
+		return current;
 }
 
 inline void Parser::accept(int n)
@@ -68,7 +70,7 @@ inline void Parser::match_if(token_name tok)
 
 }
 
-void Parser::parse_basic_type()
+type* Parser::parse_basic_type()
 {
 
 	switch (lookahead())
@@ -77,52 +79,61 @@ void Parser::parse_basic_type()
 		case tok_ts_bool:
 		case tok_ts_int:
 		case tok_ts_float:
-		case tok_ts_char:
-			return accept();
+		case tok_ts_char: 
+			accept();
+			return new type;
 	}
 
 	throw std::runtime_error("Expected basic-type");
 }
-void Parser::parse_type_list()
-{}
 
-void Parser::parse_postfix_type()
+type* Parser::parse_postfix_type()
 {
 	switch (lookahead())
 	{
 		case tok_mul:
 		case tok_kw_const:
 		case tok_kw_volatile:
-			return accept();
+			accept();
+			return new type;
 
 		case tok_left_bracket:
 			match(tok_left_bracket);
 			if (lookahead() != tok_right_brace)
-				parse_expr();
-			return match(tok_right_brace);
+			{
+				expr* e = parse_expr();
+			}
+			match(tok_right_brace);
+			return new type;
 
 		default:
-			return parse_basic_type();
+			type* basic_type = parse_basic_type();
+			return new type;
 	}
 
 	throw std::runtime_error("Expected postfix type");
 }
 
 
-void Parser::parse_reference_type()
+type* Parser::parse_reference_type()
 {
-	parse_postfix_type();
+	type* post_type = parse_postfix_type();
 	while (lookahead() == tok_bitw_and)
+	{
 		accept();
+	}
 
+	return new type;
 }
 
-void Parser::parse_type()
+type* Parser::parse_type()
 {
-	parse_reference_type();
+	type* ref_type = parse_reference_type();
+
+	return new type;
 }
 
-void Parser::parse_primary_expr()
+expr* Parser::parse_primary_expr()
 {
 	switch(lookahead())
 	{
@@ -134,68 +145,78 @@ void Parser::parse_primary_expr()
 		case tok_character:
 		case tok_string:
 		case tok_identifier:
-			return accept();
+			accept();
+			return new expr;
 
 		case tok_left_paren:
 			match(tok_left_paren);
-			parse_expr();
-			return match(tok_right_paren);
+			expr* e = parse_expr();
+			match(tok_right_paren);
+			return new expr;
 	}
 
 	throw std::runtime_error("Expected primary expression");
 }
 
-bool Parser::match_if_postfix_expr()
+token*Parser::match_if_postfix_expr()
 {
 	switch (lookahead()) 
 	{
 		case tok_left_paren:
 		case tok_left_bracket:
-			accept();
-			return true;
+			return accept();
 	}
 
-	return false;
+	return nullptr;
 }
 
-void Parser::parse_postfix_expr()
+expr* Parser::parse_postfix_expr()
 {
-	parse_primary_expr();
+	expr* primary_expr = parse_primary_expr();
 
 	while (match_if_postfix_expr())
 	{
-		parse_arg_list();
-		return accept();
+		std::vector<expr*> arg_list = parse_arg_list();
+		accept();
 	}
 
-
+	return new expr;
 }
 
-bool Parser::match_if_arg_list()
+token*Parser::match_if_arg_list()
 {
 	if (lookahead() == tok_comma)
 	{
-		accept();
-		return true;
+		return accept();
 	}
 
-	return false;
+	return nullptr;
 }
 
-void Parser::parse_arg_list()
+std::vector<expr*> Parser::parse_arg_list()
 {
-	parse_arg();
+	std::vector<expr*> arg_list;
+	expr* arg = parse_arg();
+	arg_list.push_back(arg);
+
 	while (match_if_arg_list())
-		parse_arg();
+	{
+		expr* arg_more = parse_arg();
+		arg_list.push_back(arg_more);
+	}
+
+	return arg_list;
 }
 
 
-void Parser::parse_arg()
+expr* Parser::parse_arg()
 {
-	parse_expr();
+	expr* e = parse_expr();
+
+	return new expr;
 }
 
-void Parser::parse_unary_expr()
+expr* Parser::parse_unary_expr()
 {
 	switch (lookahead())
 	{
@@ -205,100 +226,102 @@ void Parser::parse_unary_expr()
 		case tok_logical_not:
 		case tok_logical_and:
 		case tok_mul:
+		{
 			accept();
-			parse_unary_expr();
+			expr* unary_expr = parse_unary_expr();
+			return new expr;
+		}
 		default:
-			parse_postfix_expr();
+		{
+			expr* post_expr = parse_postfix_expr();
+			return new expr;
+		}
 	}
 }
 
-bool  Parser::match_if_cast_expr()
+expr* Parser::parse_cast_expr()
 {
-	if (lookahead() == tok_kw_as)
-	{
-		accept();
-		parse_type();
-		return true;
-	}
-
-	return false;
-}
-
-
-void Parser::parse_cast_expr()
-{
-	parse_unary_expr();
+	expr* unary_expr = parse_unary_expr();
 	while (lookahead() == tok_kw_as) {
 		accept();
-		parse_type();
+		type* t = parse_type();
 	}
+
+	return new expr;
 }
 
-bool Parser::match_if_mul_expr()
+token*Parser::match_if_mul_expr()
 {
 	switch (lookahead()) 
 	{
 		case tok_mul:
 		case tok_div:
 		case tok_rem:
-			accept();
-			return true;
+			return accept();
 	}
 
-	return false;
+	return nullptr;
 }
 
-void Parser::parse_mul_expr()
+expr* Parser::parse_mul_expr()
 {
-	parse_cast_expr();
+	expr* cast_expr = parse_cast_expr();
 
 	while (match_if_mul_expr())
-		parse_cast_expr();
+	{
+		expr* cast_expr_more = parse_cast_expr();
+	}
+
+	return new expr;
 }
 
-bool Parser::match_if_add_expr()
+token*Parser::match_if_add_expr()
 {
 	switch (lookahead()) {
 		case tok_add:
 		case tok_sub:
-			accept();
-			return true;
+			return accept();
 		default:
-			return false;
+			return nullptr;
 	}
 }
 
-void Parser::parse_add_expr()
+expr* Parser::parse_add_expr()
 {
-	parse_mul_expr();
+	expr* mul_expr = parse_mul_expr();
 
 	while (match_if_add_expr())
-		parse_mul_expr();
+	{
+		expr* mul_expr_more = parse_mul_expr();
+	}
+
+	return new expr;
 }
 
-bool Parser::match_if_shift_expr()
+token*Parser::match_if_shift_expr()
 {
 	switch (lookahead()) 
 	{
 		case tok_shift_left:
 		case tok_shift_right:
-			accept();
-			return true;
+			return accept();
 	}
 
-	return false;
+	return nullptr;
 }
 
-void Parser::parse_shift_expr()
+expr* Parser::parse_shift_expr()
 {
-	parse_add_expr();
+	expr* add_expr = parse_add_expr();
 	while (match_if_shift_expr())
 	{
-		parse_add_expr();
+		expr* add_expr_more = parse_add_expr();
 	}
+
+	return new expr;
 }
 
-bool Parser::match_if_rel_expr()
+token*Parser::match_if_rel_expr()
 {
 	switch (lookahead()) 
 	{
@@ -306,207 +329,267 @@ bool Parser::match_if_rel_expr()
 		case tok_rel_gt:
 		case tok_rel_le:
 		case tok_rel_ge:
-			accept();
-			return true;
+			return accept();
 	}
 
-	return false;
+	return nullptr;
 }
 
-void Parser::parse_rel_expr()
+expr* Parser::parse_rel_expr()
 {
-	parse_shift_expr();
+	expr* shift_expr = parse_shift_expr();
 
 	while (match_if_rel_expr())
-		parse_shift_expr();
+	{
+		expr* shift_expr_more = parse_shift_expr();
+	}
+
+	return new expr;
 }
 
-bool Parser::match_if_eq_expr()
+token*Parser::match_if_eq_expr()
 {
 	switch (lookahead()) 
 	{
 		case tok_rel_eq:
 		case tok_rel_neq:
-			accept();
-			return true;
+			return accept();
 	}
 
-	return false;
+	return nullptr;
 }
 
-void Parser::parse_eq_expr()
+expr* Parser::parse_eq_expr()
 {
-	parse_rel_expr();
+	expr* rel_expr = parse_rel_expr();
 
 	while (match_if_eq_expr())
-		parse_rel_expr();
+	{
+		expr* rel_expr_more = parse_rel_expr();
+	}
+
+	return new expr;
 }
 
-bool Parser::match_if_bw_and_expr()
+token*Parser::match_if_bw_and_expr()
 {
 	if (lookahead() == tok_bitw_and)
 	{
-		accept();
-		return true;
+		return accept();
 	}
 
-	return false;
+	return nullptr;
 }
 
-void Parser::parse_bw_and_expr()
+expr* Parser::parse_bw_and_expr()
 {
-	parse_eq_expr();
+	expr* eq_expr = parse_eq_expr();
 
 	while (match_if_bw_and_expr())
-		parse_eq_expr();
+	{
+		expr* eq_expr_more = parse_eq_expr();
+	}
+
+	return new expr;
 }
 
 
-bool Parser::match_if_bw_xor_expr()
+token*Parser::match_if_bw_xor_expr()
 {
 	if (lookahead() == tok_bitw_xor) 
 	{
-		accept();
-		return true;
+		return accept();
 	}
 
-	return false;
+	return nullptr;
 }
 
-void Parser::parse_bw_xor_expr()
+expr* Parser::parse_bw_xor_expr()
 {
-	parse_bw_and_expr();
+	expr* bw_and_expr = parse_bw_and_expr();
 
 	while (match_if_bw_xor_expr())
-		parse_bw_and_expr();
+	{
+		expr* bw_and_expr_more = parse_bw_and_expr();
+	}
+
+	return new expr;
 }
 
-bool Parser::match_if_bw_or_expr()
+token*Parser::match_if_bw_or_expr()
 {
 	if (lookahead() == tok_bitw_or) 
 	{
-		accept();
-		return true;
+		return accept();
 	}
 
-	return false;
+	return nullptr;
 }
 
-void Parser::parse_bw_or_expr()
+expr* Parser::parse_bw_or_expr()
 {
-	parse_bw_xor_expr();
+	expr* bw_xor_expr = parse_bw_xor_expr();
 
 	while (match_if_bw_or_expr())
-		parse_bw_xor_expr();
+	{
+		expr* bw_xor_expr_more = parse_bw_xor_expr();
+	}
+
+	return new expr;
 }
 
-bool Parser::match_if_logical_and_expr()
+token*Parser::match_if_logical_and_expr()
 {
 	if (lookahead() == tok_logical_and) 
 	{
-		accept();
-		return true;
+		return accept();
 	}
 
-	return false;
+	return nullptr;
 }
 
-void Parser::parse_logical_and_expr()
+expr* Parser::parse_logical_and_expr()
 {
-	parse_bw_or_expr();
+	expr* bw_or_expr = parse_bw_or_expr();
 
 	while (match_if_logical_and_expr())
-		parse_bw_or_expr();
+	{
+		expr* bw_or_expr_more = parse_bw_or_expr();
+	}
+
+	return new expr;
 }
 
-bool Parser::match_if_logical_or_expr()
+token*Parser::match_if_logical_or_expr()
 {
 	if (lookahead() == tok_logical_or) 
 	{
-		accept();
-		return true;
+		return accept();
 	}
 
-	return false;
+	return nullptr;
 }
 
-void Parser::parse_logical_or_expr()
+expr* Parser::parse_logical_or_expr()
 {
-	parse_logical_and_expr();
+	expr* log_and_expr = parse_logical_and_expr();
 
 	while (match_if_logical_or_expr())
-		parse_logical_and_expr();
+	{
+		expr* log_and_expr_more = parse_logical_and_expr();
+	}
+
+
+	return new expr;
 }
 
-void Parser::parse_conditional_expr()
+/*%%%%%%%%%%%%%%%%%%%*/
+expr* Parser::parse_conditional_expr()
 {
-	parse_logical_or_expr();
+	expr* log_or_expr1 = parse_logical_or_expr();
 
 	if (lookahead() == tok_conditional_operator)
 	{
 		accept();
-		parse_expr();
+		expr* e = parse_expr();
 		match(tok_colon);
-		parse_conditional_expr();
+		expr* cond_expr = parse_conditional_expr();
+
+		return new expr;
 	}
+
+	return new expr;
 }
 
-void Parser::parse_assign_expr()
+expr* Parser::parse_assign_expr()
 {
-	parse_conditional_expr();
+	expr* cond_expr = parse_conditional_expr();
 
 	if (lookahead() == tok_assignment_operator)
 	{
 		accept();
-		parse_assign_expr(); 
-		return;
+		expr* assign_expr = parse_assign_expr(); 
+
+		return new expr;
 	}
 
+	return new expr;
 }
 
-void Parser::parse_expr()
+expr* Parser::parse_expr()
 {
-	parse_assign_expr();
+	expr* assign_expr = parse_assign_expr();
+
+	return new expr;
 }
 
-void Parser::parse_const_expr()
+expr* Parser::parse_const_expr()
 {
-	parse_conditional_expr();
+	expr* cond_expr = parse_conditional_expr();
+
+	return new expr;
 }
 
-void Parser::parse_stmt()
+stmt* Parser::parse_stmt()
 {
 	switch (lookahead()) 
 	{
 		case tok_left_brace:
-			return parse_block_stmt();
+		{
+			stmt* block_stmt = parse_block_stmt();
+			return new stmt;
+		}
 		case tok_kw_if:
-			return parse_if_stmt();
+		{
+			stmt* if_stmt = parse_if_stmt();
+			return new stmt;
+		}
 		case tok_kw_while:
-			return parse_while_stmt();
+		{
+			stmt* while_stmt = parse_while_stmt();
+			return new stmt;
+		}
 		case tok_kw_break:
-			return parse_break_stmt();
+		{
+			stmt* break_stmt = parse_break_stmt();
+			return new stmt;
+		}
 		case tok_kw_continue:
-			return parse_continue_stmt();
+		{
+			stmt* cont_stmt = parse_continue_stmt();
+			return new stmt;
+		}
 		case tok_kw_return:
-			return parse_return_stmt();
+		{
+			stmt* return_stmt = parse_return_stmt();
+			return new stmt;
+		}
 		case tok_kw_def:
 		case tok_kw_let:
 		case tok_kw_var:
-			return parse_decl_stmt();	
+		{
+			stmt* decl_stmt = parse_decl_stmt();
+			return new stmt;
+		}
 	}
 
-	parse_expr_stmt();
+	stmt* expr_stmt = parse_expr_stmt();
+
+	return new stmt;
 }
 
-void Parser::parse_block_stmt()
+stmt* Parser::parse_block_stmt()
 {
 	match(tok_left_brace);
-	parse_stmt_seq();
+	std::vector<stmt*> stmt_seq = parse_stmt_seq();
 	match(tok_right_brace);
+
+	return new stmt;
 }
 
-bool Parser::match_if_stmt_seq()
+
+/* This may be buggy vvvv*/
+token*Parser::match_if_stmt_seq()
 {
 	switch (lookahead())
 	{
@@ -525,92 +608,128 @@ bool Parser::match_if_stmt_seq()
 		case tok_hexadecimal_integer:
 		case tok_character:
 		case tok_boolean:
-			return true;
+			return *first;
 	}
 
-	return false;
+	return nullptr;
 }
 
-void Parser::parse_stmt_seq()
+std::vector<stmt*> Parser::parse_stmt_seq()
 {
-	parse_stmt();
+	std::vector<stmt*> stmt_seq;
+
+	stmt* s = parse_stmt();
+	stmt_seq.push_back(s);
+
 	while (match_if_stmt_seq())
-		parse_stmt();
+	{
+		stmt* s_more = parse_stmt();
+		stmt_seq.push_back(s_more);
+	}
+
+	return stmt_seq;
 }
 
-void Parser::parse_if_stmt()
+stmt* Parser::parse_if_stmt()
 {
 	match(tok_kw_if);
 	match(tok_left_paren);
-	parse_expr();
+
+	expr* e = parse_expr();
+
 	match(tok_right_paren);
-	parse_stmt();
+
+	stmt* s = parse_stmt();
+
 	if (lookahead() == tok_kw_else) 
 	{
 		match(tok_kw_else);
-		parse_stmt();
+		stmt* s_more = parse_stmt();
 	}
-	
+
+	return new stmt;
 }
 
-void Parser::parse_while_stmt()
+stmt* Parser::parse_while_stmt()
 {
 	match(tok_kw_while);
 	match(tok_left_paren);
-	parse_expr();
+
+	expr* e = parse_expr();
+
 	match(tok_right_paren);
-	parse_stmt();
+
+	stmt* s = parse_stmt();
+
+	return new stmt;
 }
 
-void Parser::parse_break_stmt()
+stmt* Parser::parse_break_stmt()
 {
 	match(tok_kw_break);
 	match(tok_semicolon);
+
+	return new stmt;
 }
 
-void Parser::parse_continue_stmt()
+stmt* Parser::parse_continue_stmt()
 {
 	match(tok_kw_continue);
 	match(tok_semicolon);
+
+	return new stmt;
 }
 
-void Parser::parse_return_stmt()
+stmt* Parser::parse_return_stmt()
 {
 	match(tok_kw_return);
 	if (lookahead() == tok_semicolon)
-		return accept();
-	parse_expr();
+	{
+		accept();
+		return new stmt;
+	}
+	expr* e = parse_expr();
 	match(tok_semicolon);
+
+	return new stmt;
 }
 
-void Parser::parse_decl_stmt()
+stmt* Parser::parse_decl_stmt()
 {
-	parse_local_decl();
+	decl* local_dec = parse_local_decl();
+
+	return new stmt;
 }
 
-void Parser::parse_expr_stmt()
+stmt* Parser::parse_expr_stmt()
 {
-	parse_expr();
+	expr* e = parse_expr();
 	match(tok_semicolon);
+
+	return new stmt;
 }
 
-void Parser::parse_program()
+decl* Parser::parse_program()
 {
-	parse_decl_seq();
+	std::vector<decl*> decl_seq = parse_decl_seq();
+
+	return new decl;
 }
 
-bool Parser::match_if_decl_seq()
+std::vector<decl*> Parser::parse_decl_seq()
 {
-	return false;
+	std::vector<decl*> decl_list;
+
+	while(first < last)
+	{ 
+		decl* d = parse_decl();
+		decl_list.push_back(d);
+	}
+
+	return decl_list;
 }
 
-void Parser::parse_decl_seq()
-{
-	while(first != last)
-		parse_decl();
-}
-
-void Parser::parse_decl()
+decl* Parser::parse_decl()
 {
 	switch (lookahead()) 
 	{
@@ -618,115 +737,160 @@ void Parser::parse_decl()
 		{
 			token_name la = lookahead(2);
 			if (la == tok_colon)
-				return parse_obj_def();
+			{
+				decl* obj_def = parse_obj_def();
+
+				return new decl;
+			}
 			else if (la == tok_left_paren)
-				return parse_func_def();
+			{
+				decl* func_def = parse_func_def();
+
+				return new decl;
+			}
 		}
 		case tok_kw_let:
 		case tok_kw_var:
-			return parse_obj_def();
+			decl* obj_def = parse_obj_def();
+
+			return new decl;
 	}
 
 	throw std::runtime_error("Expected declaration");
 }
 
-void Parser::parse_local_decl()
+decl* Parser::parse_local_decl()
 {
-	parse_obj_def();
+	decl* obj = parse_obj_def();
+
+	return new decl;
 }
 
-void Parser::parse_obj_def()
+decl* Parser::parse_obj_def()
 {
 	switch (lookahead())
 	{
 		case tok_kw_def:
-			return parse_val_def();
+		{
+			decl* def = parse_val_def();
+			return new decl;
+		}
 		case tok_kw_let:
-			return parse_const_def();
+		{
+			decl* let = parse_const_def();
+			return new decl;
+		}
 		case tok_kw_var:
-			return parse_var_def();
+		{
+			decl* var = parse_var_def();
+			return new decl;
+		}
 	}
 
 	throw std::runtime_error("Expected onject definition");
 }
 
-void Parser::parse_var_def()
+decl* Parser::parse_var_def()
 {
 	match(tok_kw_var);
 	match(tok_identifier);
 	match(tok_colon);
-	parse_type();
+	type* t = parse_type();
 
 	switch (lookahead()) 
 	{
 		case tok_semicolon:
-			return match(tok_semicolon);
+		{
+			match(tok_semicolon);
+
+			return new decl;
+		}
 		case tok_assignment_operator:
+		{
 			match(tok_assignment_operator);
-			parse_expr();
-			return match(tok_semicolon);
+			expr* e = parse_expr();
+			match(tok_semicolon);
+
+			return new decl;
+		}
 	}
 
 	throw std::runtime_error("Expected variable definition");
 }
 
-void Parser::parse_const_def()
+decl* Parser::parse_const_def()
 {
 	match(tok_kw_let);
 	match(tok_identifier);
 	match(tok_colon);
-	parse_type();
+	type* t = parse_type();
 	match(tok_assignment_operator);
-	parse_expr();
+	expr* e = parse_expr();
 	match(tok_semicolon);
+
+	return new decl;
 }
 
-void Parser::parse_val_def()
+decl* Parser::parse_val_def()
 {
 	match(tok_kw_def);
 	match(tok_identifier);
 	match(tok_colon);
-	parse_type();
+	type* t = parse_type();
 	match(tok_assignment_operator);
-	parse_expr();
+	expr* e = parse_expr();
 	match(tok_semicolon);
+
+	return new decl;
 }
 
-void Parser::parse_func_def()
+decl* Parser::parse_func_def()
 {
 	match(tok_kw_def);
 	match(tok_identifier);
 	match(tok_left_paren);
-	parse_param_list();
+	if(lookahead() != tok_right_paren)
+		std::vector<decl*> param_list = parse_param_list();
 	match(tok_right_paren);
 	match(tok_sub);
 	match(tok_rel_gt);
-	parse_type();
-	parse_block_stmt();
+	type* t = parse_type();
+	stmt* block_stmt = parse_block_stmt();
+
+	return new decl;
 }
 
-bool Parser::match_if_param_list()
+token* Parser::match_if_param_list()
 {
 	if (lookahead() == tok_comma) 
 	{
-		accept();
-		return true;
+		return accept();
 	}
 
-	return false;
+	return nullptr;
 }
 
-void Parser::parse_param_list()
+std::vector<decl*> Parser::parse_param_list()
 {
-	parse_param();
+	std::vector<decl*> param_list;
+
+	decl* param = parse_param();
+	param_list.push_back(param);
 
 	while (match_if_param_list())
-		parse_param();
+	{
+		decl* param_more = parse_param();
+		param_list.push_back(param_more);
+	}
+
+	return param_list;
 }
 
-void Parser::parse_param()
+decl* Parser::parse_param()
 {
 	match(tok_identifier);
 	match(tok_colon);
-	parse_type();
+	type* t = parse_type();
+
+	return new decl;
 }

@@ -2,7 +2,13 @@
 
 #include "token.hpp"
 #include "location.hpp"
+
 #include "semantics.hpp"
+#include "expression.hpp"
+#include "declaration.hpp"
+#include "type.hpp"
+#include "statement.hpp"
+
 #include <vector>
 #include <cassert>
 #include <iostream>
@@ -13,8 +19,7 @@ struct Parser {
 
 	std::vector<token*> tokens;
 
-	std::vector<token*>::const_iterator first;
-	std::vector<token*>::const_iterator last;
+	std::vector<token*>::const_iterator first, last;
 
 	Parser(const std::vector<token*>& token_stream);
 
@@ -24,78 +29,76 @@ struct Parser {
 
 	void match(token_name tok);
 	void match_if(token_name tok);
-	void accept();
+	token* accept();
 	void accept(int n);
 
 	// Types
-	void parse_basic_type();
-	void parse_type_list();
-	void parse_postfix_type();
-	void parse_reference_type();
-	void parse_type();
+	type* parse_basic_type();
+	//std::vector<type*> parse_type_list();
+	type* parse_postfix_type();
+	type* parse_reference_type();
+	type* parse_type();
 
 	// Expressions
-	void parse_primary_expr();
-	bool match_if_postfix_expr();
-	void parse_postfix_expr();
-	bool match_if_arg_list();
-	void parse_arg_list();
-	void parse_arg();
-	void parse_unary_expr();
-	bool match_if_cast_expr();
-	void parse_cast_expr();
-	bool match_if_mul_expr();
-	void parse_mul_expr();
-	bool match_if_add_expr();
-	void parse_add_expr();
-	bool match_if_shift_expr();
-	void parse_shift_expr();
-	bool match_if_rel_expr();
-	void parse_rel_expr();
-	bool match_if_eq_expr();
-	void parse_eq_expr();
-	bool match_if_bw_and_expr();
-	void parse_bw_and_expr();
-	bool match_if_bw_xor_expr();
-	void parse_bw_xor_expr();
-	bool match_if_bw_or_expr();
-	void parse_bw_or_expr();
-	bool match_if_logical_and_expr();
-	void parse_logical_and_expr();
-	bool match_if_logical_or_expr();
-	void parse_logical_or_expr();
-	void parse_conditional_expr();
-	void parse_assign_expr();
-	void parse_expr();
-	void parse_const_expr();
+	expr* parse_primary_expr();
+	token* match_if_postfix_expr();
+	expr* parse_postfix_expr();
+	token* match_if_arg_list();
+	std::vector<expr*> parse_arg_list();
+	expr* parse_arg();
+	expr* parse_unary_expr();
+	expr* parse_cast_expr();
+	token* match_if_mul_expr();
+	expr* parse_mul_expr();
+	token* match_if_add_expr();
+	expr* parse_add_expr();
+	token* match_if_shift_expr();
+	expr* parse_shift_expr();
+	token* match_if_rel_expr();
+	expr* parse_rel_expr();
+	token* match_if_eq_expr();
+	expr* parse_eq_expr();
+	token* match_if_bw_and_expr();
+	expr* parse_bw_and_expr();
+	token* match_if_bw_xor_expr();
+	expr* parse_bw_xor_expr();
+	token* match_if_bw_or_expr();
+	expr* parse_bw_or_expr();
+	token* match_if_logical_and_expr();
+	expr* parse_logical_and_expr();
+	token* match_if_logical_or_expr();
+	expr* parse_logical_or_expr();
+	expr* parse_conditional_expr();
+	expr* parse_assign_expr();
+	expr* parse_expr();
+	expr* parse_const_expr();
 
 	// Statements
-	void parse_stmt();
-	void parse_block_stmt();
-	bool match_if_stmt_seq();
-	void parse_stmt_seq();
-	void parse_if_stmt();
-	void parse_while_stmt();
-	void parse_break_stmt();
-	void parse_continue_stmt();
-	void parse_return_stmt();
-	void parse_decl_stmt();
-	void parse_expr_stmt();
+	stmt* parse_stmt();
+	stmt* parse_block_stmt();
+	token* match_if_stmt_seq();
+	std::vector<stmt*> parse_stmt_seq();
+	stmt* parse_if_stmt();
+	stmt* parse_while_stmt();
+	stmt* parse_break_stmt();
+	stmt* parse_continue_stmt();
+	stmt* parse_return_stmt();
+	stmt* parse_decl_stmt();
+	stmt* parse_expr_stmt();
 
 	// Declarations
-	void parse_program();
-	bool match_if_decl_seq();
-	void parse_decl_seq();
-	void parse_decl();
-	void parse_local_decl();
-	void parse_obj_def();
-	void parse_var_def();
-	void parse_const_def();
-	void parse_val_def();
-	void parse_func_def();
-	bool match_if_param_list();
-	void parse_param_list();
-	void parse_param();
+	decl* parse_program();
+	std::vector<decl*> parse_decl_seq();
+	decl* parse_decl();
+	decl* parse_local_decl();
+	decl* parse_obj_def();
+	decl* parse_var_def();
+	decl* parse_const_def();
+	decl* parse_val_def();
+	decl* parse_func_def();
+	token* match_if_param_list();
+	std::vector<decl*> parse_param_list();
+	decl* parse_param();
 
 	Semantics sem;
 };

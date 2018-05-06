@@ -53,6 +53,15 @@
     <ClInclude Include="semantics.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="declaration.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="statement.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="type.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="parser_t.mc">
@@ -62,6 +71,9 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="func_call.mc">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="parser_t2.mc">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

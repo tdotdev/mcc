@@ -349,7 +349,9 @@ token* lexer::lex_word() {
 }
 
 token* lexer::scan() {
-	while (!eof()) {
+	while (true) {
+		if (eof())
+			return nullptr;
 		switch (*first) {
 			case ' ':
 				skip_whitespace();

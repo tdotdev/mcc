@@ -11,22 +11,24 @@ std::string init_source(std::string);
 
 int main()
 {
-	std::string source{ init_source("parser_t.mc") };
+	std::string source{ init_source("parser_t2.mc") };
 
-	lexer lex(source);
+	lexer lexer(source);
 	std::vector<token*> tokens;
 
-	while(!lex.eof()){
-		tokens.push_back(lex.scan());
+	while(!lexer.eof()){
+
+		token* tok = lexer.scan();
+		if(tok != nullptr)
+			tokens.push_back(tok);
 	}
 
 	//print_token_stream(tokens);
 
-	Parser parse(tokens);
-	parse.parse_decl_seq();
+	Parser parser(tokens);
+	parser.parse_program();
 
-
-	std::cout << "End.\n";
+	std::cout << "Wow, it didn't break!\n";
 	char a;
 	std::cin >> a;
 

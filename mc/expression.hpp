@@ -1,7 +1,7 @@
 #pragma once
 
 struct expr {
-	virtual void to_string() = 0;
+
 };
 
 enum binary_op {

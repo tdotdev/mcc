@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -117,6 +117,7 @@
     <ClCompile Include="token.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="declaration.hpp" />
     <ClInclude Include="expression.hpp" />
     <ClInclude Include="lexer.hpp" />
     <ClInclude Include="location.hpp" />
@@ -124,9 +125,12 @@
     <ClInclude Include="parser.hpp" />
     <ClInclude Include="scope.hpp" />
     <ClInclude Include="semantics.hpp" />
+    <ClInclude Include="statement.hpp" />
     <ClInclude Include="token.hpp" />
+    <ClInclude Include="type.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="parser_t2.mc" />
     <None Include="func_call.mc" />
     <None Include="parser_t.mc" />
     <None Include="lexer_t.mc" />
