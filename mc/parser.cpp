@@ -632,13 +632,15 @@ stmt* Parser::parse_if_stmt()
 
 	stmt* s = parse_stmt();
 
+	stmt* s_more = nullptr;
 	if (lookahead() == tok_kw_else) 
 	{
 		match(tok_kw_else);
-		stmt* s_more = parse_stmt();
+		s_more = parse_stmt();
 	}
 
-	return new stmt;
+
+	return semantics.new_if_stmt(e, s, s_more);
 }
 
 stmt* Parser::parse_while_stmt()
@@ -652,7 +654,7 @@ stmt* Parser::parse_while_stmt()
 
 	stmt* s = parse_stmt();
 
-	return new stmt;
+	return semantics.new_while_stmt(e, s);
 }
 
 stmt* Parser::parse_break_stmt()
@@ -660,7 +662,7 @@ stmt* Parser::parse_break_stmt()
 	match(tok_kw_break);
 	match(tok_semicolon);
 
-	return new stmt;
+	return semantics.new_break_stmt();
 }
 
 stmt* Parser::parse_continue_stmt()
@@ -668,7 +670,7 @@ stmt* Parser::parse_continue_stmt()
 	match(tok_kw_continue);
 	match(tok_semicolon);
 
-	return new stmt;
+	return semantics.new_continue_stmt();
 }
 
 stmt* Parser::parse_return_stmt()
@@ -682,14 +684,14 @@ stmt* Parser::parse_return_stmt()
 	expr* e = parse_expr();
 	match(tok_semicolon);
 
-	return new stmt;
+	return semantics.new_return_stmt(e);
 }
 
 stmt* Parser::parse_decl_stmt()
 {
 	decl* local_dec = parse_local_decl();
 
-	return new stmt;
+	return semantics.new_decl_stmt(local_dec);
 }
 
 stmt* Parser::parse_expr_stmt()
@@ -697,7 +699,7 @@ stmt* Parser::parse_expr_stmt()
 	expr* e = parse_expr();
 	match(tok_semicolon);
 
-	return new stmt;
+	return semantics.new_expr_stmt(e);
 }
 
 decl* Parser::parse_program()

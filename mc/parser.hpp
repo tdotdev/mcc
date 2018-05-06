@@ -17,7 +17,7 @@ struct Parser
 {
 	Parser(const std::vector<token*>& token_stream);	
 
-	Semantics sem;
+	Semantics semantics;
 
 	std::vector<token*> tokens;
 	std::vector<token*>::const_iterator first, last;

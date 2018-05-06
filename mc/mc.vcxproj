@@ -114,6 +114,7 @@
     <ClCompile Include="lexer.cpp" />
     <ClCompile Include="mc.cpp" />
     <ClCompile Include="parser.cpp" />
+    <ClCompile Include="semantics.cpp" />
     <ClCompile Include="token.cpp" />
   </ItemGroup>
   <ItemGroup>
