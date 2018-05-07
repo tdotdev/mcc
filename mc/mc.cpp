@@ -28,7 +28,7 @@ int main()
 	Parser parser(tokens);
 	parser.parse_program();
 
-	std::cout << "Nice.\n";
+	std::cout << "\n>>> Nice.\n";
 	char a;
 	std::cin >> a;
 

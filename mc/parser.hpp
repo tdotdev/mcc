@@ -25,7 +25,8 @@ struct Parser
 	token_name lookahead();
 	token_name lookahead(int n);
 
-	token* accept();
+	token* accept(); 
+	token* accept_if(token_name tok);
 
 	void match(token_name tok);
 	void match_if(token_name tok);

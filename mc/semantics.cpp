@@ -1,5 +1,56 @@
 #include "semantics.hpp"
 
+decl* Semantics::new_program(std::vector<decl*> dec_seq)
+{
+	return nullptr;
+}
+
+decl* Semantics::new_var_decl(token* tok, type* t)
+{
+	return nullptr;
+}
+
+decl* Semantics::new_var_def(decl* var_decl, expr* e)
+{
+	return nullptr;
+}
+
+decl* Semantics::new_const_decl(token* tok, type* t)
+{
+	return nullptr;
+}
+
+decl* Semantics::new_const_def(decl* var_decl, expr* e)
+{
+	return nullptr;
+}
+
+decl* Semantics::new_val_decl(token* tok, type* t)
+{
+	return nullptr;
+}
+
+decl* Semantics::new_val_def(decl* var_decl, expr* e)
+{
+	return nullptr;
+}
+
+decl* Semantics::new_func_decl(token* tok, std::vector<decl*> params, type* t)
+{
+	return nullptr;
+}
+decl* Semantics::new_func_def(decl* func_decl, stmt* func_body)
+{
+	return nullptr;
+}
+
+decl* Semantics::new_param(token* param, type* t)
+{
+	return nullptr;
+}
+
+
+
 stmt* Semantics::new_block_stmt(std::vector<stmt*> stmt_seq)
 {
 	return new block_stmt(stmt_seq);

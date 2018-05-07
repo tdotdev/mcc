@@ -10,6 +10,17 @@
 
 struct Semantics {
 
+	decl* new_program(std::vector<decl*> dec_seq);
+	decl* new_var_decl(token* tok, type* t);
+	decl* new_var_def(decl* var_decl, expr* e);
+	decl* new_const_decl(token* tok, type* t);
+	decl* new_const_def(decl* var_decl, expr* e);
+	decl* new_val_decl(token* tok, type* t);
+	decl* new_val_def(decl* var_decl, expr* e);
+	decl* new_func_decl(token* tok, std::vector<decl*> params, type* t);
+	decl* new_func_def(decl* func_decl, stmt* func_body);
+	decl* new_param(token* param, type* t);
+
 	stmt* new_block_stmt(std::vector<stmt*> stmt_seq);
 	stmt* new_if_stmt(expr* condition, stmt* if_true, stmt* if_false);
 	stmt* new_while_stmt(expr* condition, stmt* statement);

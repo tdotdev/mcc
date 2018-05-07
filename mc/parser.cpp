@@ -17,7 +17,7 @@ Parser::Parser(const std::vector<token*>& token_stream)
 	
 }
 
-inline token_name Parser::lookahead() {
+token_name Parser::lookahead() {
 
 	if(first != last)
 		return (*first)->getType();
@@ -25,7 +25,7 @@ inline token_name Parser::lookahead() {
 	return tok_eof;
 }
 
-inline token_name Parser::lookahead(int n)
+token_name Parser::lookahead(int n)
 {
 	std::vector<token*>::const_iterator it{ first };
 
@@ -34,12 +34,21 @@ inline token_name Parser::lookahead(int n)
 	return (*it)->getType();
 }
 
-inline token* Parser::accept()
+token* Parser::accept()
 {
 		assert(first != last);
 		token* current = *first;
 		++first;
 		return current;
+}
+
+token* Parser::accept_if(token_name tok)
+{
+	assert(first != last);
+	assert(tok == (*first)->getType());
+	token* current = *first;
+	++first;
+	return current;
 }
 
 inline void Parser::match(token_name tok)
@@ -805,22 +814,16 @@ decl* Parser::parse_decl()
 			token_name la = lookahead(2);
 			if (la == tok_colon)
 			{
-				decl* obj_def = parse_obj_def();
-
-				return new decl;
+				return parse_obj_def();
 			}
 			else if (la == tok_left_paren)
 			{
-				decl* func_def = parse_func_def();
-
-				return new decl;
+				return parse_func_def();
 			}
 		}
 		case tok_kw_let:
 		case tok_kw_var:
-			decl* obj_def = parse_obj_def();
-
-			return new decl;
+			return parse_obj_def();
 	}
 
 	throw std::runtime_error("Expected declaration");
@@ -828,9 +831,7 @@ decl* Parser::parse_decl()
 
 decl* Parser::parse_local_decl()
 {
-	decl* obj = parse_obj_def();
-
-	return new decl;
+	return parse_obj_def();
 }
 
 decl* Parser::parse_obj_def()
@@ -839,18 +840,15 @@ decl* Parser::parse_obj_def()
 	{
 		case tok_kw_def:
 		{
-			decl* def = parse_val_def();
-			return new decl;
+			return parse_val_def();
 		}
 		case tok_kw_let:
 		{
-			decl* let = parse_const_def();
-			return new decl;
+			return parse_const_def();
 		}
 		case tok_kw_var:
 		{
-			decl* var = parse_var_def();
-			return new decl;
+			return parse_var_def();
 		}
 	}
 
@@ -860,10 +858,17 @@ decl* Parser::parse_obj_def()
 decl* Parser::parse_var_def()
 {
 	match(tok_kw_var);
-	match(tok_identifier);
+	token* var_id = accept_if(tok_identifier);
 	match(tok_colon);
 	type* t = parse_type();
+	decl* var_decl = semantics.new_var_decl(var_id, t);
+	match(tok_assignment_operator);
+	expr* e = parse_expr();
+	match(tok_semicolon);
 
+	return semantics.new_var_def(var_decl, e);
+
+	/*
 	switch (lookahead()) 
 	{
 		case tok_semicolon:
@@ -878,53 +883,61 @@ decl* Parser::parse_var_def()
 			expr* e = parse_expr();
 			match(tok_semicolon);
 
-			return new decl;
+			return semantics.new_var_def(var_decl, e);
 		}
 	}
+	*/
 
-	throw std::runtime_error("Expected variable definition");
+	//throw std::runtime_error("Expected variable definition");
 }
 
 decl* Parser::parse_const_def()
 {
 	match(tok_kw_let);
-	match(tok_identifier);
+	token* const_id = accept_if(tok_identifier);
 	match(tok_colon);
 	type* t = parse_type();
 	match(tok_assignment_operator);
 	expr* e = parse_expr();
 	match(tok_semicolon);
 
-	return new decl;
+	decl* const_decl = semantics.new_const_decl(const_id, t);
+
+	return semantics.new_const_def(const_decl, e);
 }
 
 decl* Parser::parse_val_def()
 {
 	match(tok_kw_def);
-	match(tok_identifier);
+	token* val_id = accept_if(tok_identifier);
 	match(tok_colon);
 	type* t = parse_type();
 	match(tok_assignment_operator);
 	expr* e = parse_expr();
 	match(tok_semicolon);
 
-	return new decl;
+	decl* val_decl = semantics.new_val_decl(val_id, t);
+
+	return semantics.new_val_def(val_decl, e);
 }
 
 decl* Parser::parse_func_def()
 {
 	match(tok_kw_def);
-	match(tok_identifier);
+	token* func_id = accept_if(tok_identifier);
 	match(tok_left_paren);
+	std::vector<decl*> param_list;
 	if(lookahead() != tok_right_paren)
-		std::vector<decl*> param_list = parse_param_list();
+		param_list = parse_param_list();
 	match(tok_right_paren);
 	match(tok_sub);
 	match(tok_rel_gt);
+
 	type* t = parse_type();
+	decl* func_decl = semantics.new_func_decl(func_id, param_list, t);
 	stmt* block_stmt = parse_block_stmt();
 
-	return new decl;
+	return semantics.new_func_def(func_decl, block_stmt);
 }
 
 token* Parser::match_if_param_list()
@@ -955,9 +968,10 @@ std::vector<decl*> Parser::parse_param_list()
 
 decl* Parser::parse_param()
 {
-	match(tok_identifier);
+	//match(tok_identifier);
+	token* param = accept_if(tok_identifier);
 	match(tok_colon);
 	type* t = parse_type();
 
-	return new decl;
+	return semantics.new_param(param, t);
 }
