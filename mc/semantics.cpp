@@ -40,6 +40,111 @@ stmt* Semantics::new_expr_stmt(expr* expression)
 	return new expr_stmt(expression);
 }
 
+expr* Semantics::new_boolean_literal(token* tok)
+{
+	return nullptr;
+}
+
+expr* Semantics::new_integer_literal(token* tok)
+{
+	return nullptr;
+}
+
+expr* Semantics::new_float_literal(token* tok)
+{
+	return nullptr;
+}
+
+expr* Semantics::new_char_literal(token* tok)
+{
+	return nullptr;
+}
+
+expr* Semantics::new_string_literal(token* tok)
+{
+	return nullptr;
+}
+
+expr* Semantics::new_identifier(token* tok)
+{
+	return nullptr;
+}
+
+expr* Semantics::new_postfix_expr(expr* expression, std::vector<expr*> args)
+{
+	return nullptr;
+}
+
+expr* Semantics::new_unary_expr(token_name unary_op, expr* expression)
+{
+	return nullptr;
+}
+
+expr* Semantics::new_cast_expr(expr* cast_expr, type* ts)
+{
+	return nullptr;
+}
+
+expr* Semantics::new_mul_expr(token_name mul_op, expr* lhs, expr* rhs)
+{
+	return nullptr;
+}
+
+expr* Semantics::new_add_expr(token_name ad_op, expr* lhs, expr* rhs)
+{
+	return nullptr;
+}
+
+expr* Semantics::new_shift_expr(token_name shift_op, expr* lhs, expr* rhs)
+{
+	return nullptr;
+}
+
+expr* Semantics::new_rel_expr(token_name rel_op, expr* lhs, expr* rhs)
+{
+	return nullptr;
+}
+
+expr* Semantics::new_eq_expr(token_name eq_op, expr* lhs, expr* rhs)
+{
+	return nullptr;
+}
+
+expr* Semantics::new_bw_and_expr(expr* lhs, expr* rhs)
+{
+	return nullptr;
+}
+
+expr* Semantics::new_bw_xor_expr(expr* lhs, expr* rhs)
+{
+	return nullptr;
+}
+
+expr* Semantics::new_bw_or_expr(expr* lhs, expr* rhs)
+{
+	return nullptr;
+}
+
+expr* Semantics::new_log_and_expr(expr* lhs, expr* rhs)
+{
+	return nullptr;
+}
+
+expr* Semantics::new_log_or_expr(expr* lhs, expr* rhs)
+{
+	return nullptr;
+}
+
+expr* Semantics::new_cond_expr(expr* expr1, expr* expr2, expr* expr3)
+{
+	return nullptr;
+}
+
+expr* Semantics::new_assign_expr(expr* lhs, expr* rhs)
+{
+	return nullptr;
+}
+
 
 type* Semantics::new_void_type()
 {

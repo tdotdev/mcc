@@ -192,19 +192,23 @@ expr* Parser::parse_primary_expr()
 		case tok_binary_integer:
 		case tok_decimal_integer:
 		case tok_hexadecimal_integer:
+			return semantics.new_integer_literal(accept());
 		case tok_boolean:
+			return semantics.new_boolean_literal(accept());
 		case tok_floating_point:
+			return semantics.new_float_literal(accept());
 		case tok_character:
+			return semantics.new_char_literal(accept());
 		case tok_string:
+			return semantics.new_string_literal(accept());
 		case tok_identifier:
-			accept();
-			return new expr;
+			return semantics.new_identifier(accept());
 
 		case tok_left_paren:
 			match(tok_left_paren);
 			expr* e = parse_expr();
 			match(tok_right_paren);
-			return new expr;
+			return e;
 	}
 
 	throw std::runtime_error("Expected primary expression");
@@ -225,14 +229,14 @@ token*Parser::match_if_postfix_expr()
 expr* Parser::parse_postfix_expr()
 {
 	expr* primary_expr = parse_primary_expr();
-
+	std::vector<expr*> arg_list;
 	while (match_if_postfix_expr())
 	{
-		std::vector<expr*> arg_list = parse_arg_list();
+		arg_list = parse_arg_list();
 		accept();
 	}
 
-	return new expr;
+	return semantics.new_postfix_expr(primary_expr, arg_list);
 }
 
 token*Parser::match_if_arg_list()
@@ -263,9 +267,7 @@ std::vector<expr*> Parser::parse_arg_list()
 
 expr* Parser::parse_arg()
 {
-	expr* e = parse_expr();
-
-	return new expr;
+	return parse_expr();
 }
 
 expr* Parser::parse_unary_expr()
@@ -281,12 +283,11 @@ expr* Parser::parse_unary_expr()
 		{
 			accept();
 			expr* unary_expr = parse_unary_expr();
-			return new expr;
+			return semantics.new_unary_expr(lookahead(), unary_expr);
 		}
 		default:
 		{
-			expr* post_expr = parse_postfix_expr();
-			return new expr;
+			return parse_postfix_expr();
 		}
 	}
 }
@@ -294,15 +295,17 @@ expr* Parser::parse_unary_expr()
 expr* Parser::parse_cast_expr()
 {
 	expr* unary_expr = parse_unary_expr();
-	while (lookahead() == tok_kw_as) {
+	if (lookahead() == tok_kw_as) 
+	{
 		accept();
 		type* t = parse_type();
+		return semantics.new_cast_expr(unary_expr, t);
 	}
 
-	return new expr;
+	return unary_expr;
 }
 
-token*Parser::match_if_mul_expr()
+token* Parser::match_if_mul_expr()
 {
 	switch (lookahead()) 
 	{
@@ -319,12 +322,13 @@ expr* Parser::parse_mul_expr()
 {
 	expr* cast_expr = parse_cast_expr();
 
-	while (match_if_mul_expr())
+	while (token* tok = match_if_mul_expr())
 	{
 		expr* cast_expr_more = parse_cast_expr();
+		cast_expr = semantics.new_mul_expr(tok->getType(), cast_expr, cast_expr_more);
 	}
 
-	return new expr;
+	return cast_expr;
 }
 
 token*Parser::match_if_add_expr()
@@ -342,12 +346,13 @@ expr* Parser::parse_add_expr()
 {
 	expr* mul_expr = parse_mul_expr();
 
-	while (match_if_add_expr())
+	while (token* tok = match_if_add_expr())
 	{
 		expr* mul_expr_more = parse_mul_expr();
+		mul_expr = semantics.new_mul_expr(tok->getType(), mul_expr, mul_expr_more);
 	}
 
-	return new expr;
+	return mul_expr;
 }
 
 token*Parser::match_if_shift_expr()
@@ -365,12 +370,13 @@ token*Parser::match_if_shift_expr()
 expr* Parser::parse_shift_expr()
 {
 	expr* add_expr = parse_add_expr();
-	while (match_if_shift_expr())
+	while (token* tok = match_if_shift_expr())
 	{
 		expr* add_expr_more = parse_add_expr();
+		add_expr = semantics.new_add_expr(tok->getType(), add_expr, add_expr_more);
 	}
 
-	return new expr;
+	return add_expr;
 }
 
 token*Parser::match_if_rel_expr()
@@ -391,12 +397,13 @@ expr* Parser::parse_rel_expr()
 {
 	expr* shift_expr = parse_shift_expr();
 
-	while (match_if_rel_expr())
+	while (token* tok = match_if_rel_expr())
 	{
 		expr* shift_expr_more = parse_shift_expr();
+		shift_expr = semantics.new_shift_expr(tok->getType(), shift_expr, shift_expr_more);
 	}
 
-	return new expr;
+	return shift_expr;
 }
 
 token*Parser::match_if_eq_expr()
@@ -415,12 +422,13 @@ expr* Parser::parse_eq_expr()
 {
 	expr* rel_expr = parse_rel_expr();
 
-	while (match_if_eq_expr())
+	while (token* tok = match_if_eq_expr())
 	{
 		expr* rel_expr_more = parse_rel_expr();
+		rel_expr = semantics.new_eq_expr(tok->getType(), rel_expr, rel_expr_more);
 	}
 
-	return new expr;
+	return rel_expr;
 }
 
 token*Parser::match_if_bw_and_expr()
@@ -440,9 +448,10 @@ expr* Parser::parse_bw_and_expr()
 	while (match_if_bw_and_expr())
 	{
 		expr* eq_expr_more = parse_eq_expr();
+		eq_expr = semantics.new_bw_and_expr(eq_expr, eq_expr_more);
 	}
 
-	return new expr;
+	return eq_expr;
 }
 
 
@@ -463,9 +472,11 @@ expr* Parser::parse_bw_xor_expr()
 	while (match_if_bw_xor_expr())
 	{
 		expr* bw_and_expr_more = parse_bw_and_expr();
+		// This naming scheme was a mistake ..................................
+		bw_and_expr = semantics.new_bw_xor_expr(bw_and_expr, bw_and_expr_more);
 	}
 
-	return new expr;
+	return bw_and_expr;
 }
 
 token*Parser::match_if_bw_or_expr()
@@ -485,9 +496,10 @@ expr* Parser::parse_bw_or_expr()
 	while (match_if_bw_or_expr())
 	{
 		expr* bw_xor_expr_more = parse_bw_xor_expr();
+		bw_xor_expr = semantics.new_bw_or_expr(bw_xor_expr, bw_xor_expr_more);
 	}
 
-	return new expr;
+	return bw_xor_expr;
 }
 
 token*Parser::match_if_logical_and_expr()
@@ -507,9 +519,10 @@ expr* Parser::parse_logical_and_expr()
 	while (match_if_logical_and_expr())
 	{
 		expr* bw_or_expr_more = parse_bw_or_expr();
+		bw_or_expr = semantics.new_log_and_expr(bw_or_expr, bw_or_expr_more);
 	}
 
-	return new expr;
+	return bw_or_expr;
 }
 
 token*Parser::match_if_logical_or_expr()
@@ -529,16 +542,16 @@ expr* Parser::parse_logical_or_expr()
 	while (match_if_logical_or_expr())
 	{
 		expr* log_and_expr_more = parse_logical_and_expr();
+		log_and_expr = semantics.new_log_or_expr(log_and_expr, log_and_expr_more);
 	}
 
-
-	return new expr;
+	return log_and_expr;
 }
 
 /*%%%%%%%%%%%%%%%%%%%*/
 expr* Parser::parse_conditional_expr()
 {
-	expr* log_or_expr1 = parse_logical_or_expr();
+	expr* log_or_expr = parse_logical_or_expr();
 
 	if (lookahead() == tok_conditional_operator)
 	{
@@ -547,10 +560,10 @@ expr* Parser::parse_conditional_expr()
 		match(tok_colon);
 		expr* cond_expr = parse_conditional_expr();
 
-		return new expr;
+		log_or_expr = semantics.new_cond_expr(log_or_expr, e, cond_expr);
 	}
 
-	return new expr;
+	return log_or_expr;
 }
 
 expr* Parser::parse_assign_expr()
@@ -562,24 +575,20 @@ expr* Parser::parse_assign_expr()
 		accept();
 		expr* assign_expr = parse_assign_expr(); 
 
-		return new expr;
+		cond_expr = semantics.new_assign_expr(cond_expr, assign_expr);
 	}
 
-	return new expr;
+	return cond_expr;
 }
 
 expr* Parser::parse_expr()
 {
-	expr* assign_expr = parse_assign_expr();
-
-	return new expr;
+	return parse_assign_expr();
 }
 
 expr* Parser::parse_const_expr()
 {
-	expr* cond_expr = parse_conditional_expr();
-
-	return new expr;
+	return parse_conditional_expr();
 }
 
 /*	STATEMENT PARSING	*/
