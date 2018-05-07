@@ -130,10 +130,11 @@
     <ClInclude Include="type.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="parser_t2.mc" />
-    <None Include="func_call.mc" />
+    <None Include="parser2_t.mc" />
+    <None Include="func_call_t.mc" />
     <None Include="parser_t.mc" />
     <None Include="lexer_t.mc" />
+    <None Include="stmts_t.mc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

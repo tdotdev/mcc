@@ -70,10 +70,13 @@
     <None Include="lexer_t.mc">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="func_call.mc">
+    <None Include="stmts_t.mc">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="parser_t2.mc">
+    <None Include="func_call_t.mc">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="parser2_t.mc">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

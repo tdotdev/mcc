@@ -45,6 +45,8 @@ token* Parser::accept()
 token* Parser::accept_if(token_name tok)
 {
 	assert(first != last);
+	if (tok != (*first)->getType())
+		std::cout << '\n\n' << tok << " != " << (*first)->getType() << '\n\n';
 	assert(tok == (*first)->getType());
 	token* current = *first;
 	++first;
@@ -608,46 +610,38 @@ stmt* Parser::parse_stmt()
 	{
 		case tok_left_brace:
 		{
-			stmt* block_stmt = parse_block_stmt();
-			return new stmt;
+			return parse_block_stmt();
 		}
 		case tok_kw_if:
 		{
-			stmt* if_stmt = parse_if_stmt();
-			return new stmt;
+			return parse_if_stmt();
 		}
 		case tok_kw_while:
 		{
-			stmt* while_stmt = parse_while_stmt();
-			return new stmt;
+			return parse_while_stmt();
 		}
 		case tok_kw_break:
 		{
-			stmt* break_stmt = parse_break_stmt();
-			return new stmt;
+			return parse_break_stmt();
 		}
 		case tok_kw_continue:
 		{
-			stmt* cont_stmt = parse_continue_stmt();
-			return new stmt;
+			return parse_continue_stmt();
 		}
 		case tok_kw_return:
 		{
-			stmt* return_stmt = parse_return_stmt();
-			return new stmt;
+			return parse_return_stmt();
 		}
 		case tok_kw_def:
 		case tok_kw_let:
 		case tok_kw_var:
 		{
-			stmt* decl_stmt = parse_decl_stmt();
-			return new stmt;
+			return parse_decl_stmt();
 		}
 	}
 
-	stmt* expr_stmt = parse_expr_stmt();
+	return parse_expr_stmt();
 
-	return new stmt;
 }
 
 stmt* Parser::parse_block_stmt()
@@ -656,7 +650,7 @@ stmt* Parser::parse_block_stmt()
 	std::vector<stmt*> stmt_seq = parse_stmt_seq();
 	match(tok_right_brace);
 
-	return new stmt;
+	return semantics.new_block_stmt(stmt_seq);
 }
 
 
