@@ -1,5 +1,79 @@
 #include "semantics.hpp"
 
+void Semantics::is_type(expr* e, type_t t)
+{
+	if (!(e->expr_type->type_type == t))
+		throw std::runtime_error("Expr e is not of type t");
+}
+
+void Semantics::is_reference(expr* e)
+{
+	if (!(e->expr_type->type_type == ref_t))
+		throw std::runtime_error("Reference type required");
+}
+
+void Semantics::is_same_type(type* t1, type* t2)
+{
+	if (!(t1->type_type == t2->type_type))
+		throw std::runtime_error("Non-matching types fam");
+}
+
+expr* Semantics::basic_to_bool(expr* e)
+{
+	type* t = e->expr_type;
+	bool val = true;
+
+	switch (t->type_type)
+	{
+		case bool_t:
+			bool_literal* b = static_cast<bool_literal*>(e);
+			val = b->value;
+			break;
+		case int_t:
+			int_literal* i = static_cast<int_literal*>(e);
+			if (i->value == 0)
+				val = false;
+			break;
+		case mfloat_t:
+			float_literal* f = static_cast<float_literal*>(e);
+			if (f->value == 0)
+				val = false;
+			break;
+		case char_t:
+			char_literal* c = static_cast<char_literal*>(e);
+			if (c->value == '\0')
+				val = false;
+			break;
+		default:
+			throw std::runtime_error("Not convertable to bool");
+	}
+
+	return new bool_literal(val, new_bool_type());
+}
+
+expr* Semantics::to_int(expr* e)
+{
+	int val;
+	type* t = e->expr_type;
+
+	switch (t->type_type)
+	{
+		case bool_t:
+			bool_literal* b = static_cast<bool_literal*>(e);
+			val = b->value;
+		case char_t:
+			char_literal* c = static_cast<char_literal*>(e);
+			val = c->value;
+		case mfloat_t:
+			float_literal* f = static_cast<float_literal*>(e);
+			val = f->value;
+		default:
+			throw std::runtime_error("Not convertable to int");
+	}
+
+	return new int_literal(val, new_int_type());
+}
+
 decl* Semantics::new_program(std::vector<decl*> dec_seq)
 {
 	return nullptr;
@@ -93,27 +167,37 @@ stmt* Semantics::new_expr_stmt(expr* expression)
 
 expr* Semantics::new_boolean_literal(token* tok)
 {
-	return nullptr;
+	boolean* bool_tok = static_cast<boolean*>(tok);
+
+	return new bool_literal(bool_tok->val, new_bool_type());
 }
 
 expr* Semantics::new_integer_literal(token* tok)
 {
-	return nullptr;
+	integer* int_tok = static_cast<integer*>(tok);
+
+	return new int_literal(int_tok->val, new_int_type());
 }
 
 expr* Semantics::new_float_literal(token* tok)
 {
-	return nullptr;
+	floating_point* float_tok = static_cast<floating_point*>(tok);
+
+	return new float_literal(float_tok->val, new_float_type());
 }
 
 expr* Semantics::new_char_literal(token* tok)
 {
-	return nullptr;
+	character* char_tok = static_cast<character*>(tok);
+
+	return new char_literal(char_tok->val, new_char_type());
 }
 
 expr* Semantics::new_string_literal(token* tok)
 {
-	return nullptr;
+	string* str_tok = static_cast<string*>(tok);
+
+	return new string_literal(str_tok->val, new_string_type());
 }
 
 expr* Semantics::new_identifier(token* tok)
@@ -188,14 +272,19 @@ expr* Semantics::new_log_or_expr(expr* lhs, expr* rhs)
 
 expr* Semantics::new_cond_expr(expr* expr1, expr* expr2, expr* expr3)
 {
-	return nullptr;
+	is_type(expr1, bool_t);
+	is_same_type(expr2->expr_type, expr3->expr_type);
+
+	return new cond_expr(expr1, expr2, expr3);
 }
 
 expr* Semantics::new_assign_expr(expr* lhs, expr* rhs)
 {
-	return nullptr;
-}
+	is_reference(lhs);
+	is_same_type(lhs->expr_type, rhs->expr_type);
 
+	return new assign_expr(lhs, rhs);
+}
 
 type* Semantics::new_void_type()
 {
@@ -220,6 +309,11 @@ type* Semantics::new_float_type()
 type* Semantics::new_char_type()
 {
 	return new char_type(char_t);
+}
+
+type* Semantics::new_string_type()
+{
+	return new string_type(string_t);
 }
 
 type* Semantics::new_func_type(std::vector<type*> params, type_t ret_type)

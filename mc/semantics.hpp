@@ -57,6 +57,13 @@ struct Semantics {
 	type* new_int_type();
 	type* new_float_type();
 	type* new_char_type();
+	type* new_string_type();
 	type* new_func_type(std::vector<type*> params, type_t ret_type);
 
+	expr* basic_to_bool(expr* e);
+	expr* to_int(expr* e);
+	expr* to_float(expr*e);
+	void is_type(expr* e, type_t t);
+	void is_reference(expr* e);
+	void is_same_type(type* t1, type* t2);
 };

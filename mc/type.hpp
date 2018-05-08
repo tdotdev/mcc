@@ -10,6 +10,8 @@ enum type_t {
 	int_t,
 	mfloat_t,
 	char_t,
+	string_t,
+	ref_t,
 	func_t
 };
 
@@ -50,6 +52,21 @@ struct char_type : type {
 	char_type(type_t t)
 		: type(t)
 	{}
+};
+
+struct string_type : type {
+	string_type(type_t t)
+		: type(t)
+	{}
+};
+
+struct ref_type : type {
+	ref_type(type* r, type_t t)
+		: type(t)
+		, ref_to_type(r)
+	{}
+
+	type* ref_to_type;
 };
 
 struct function_type : type {

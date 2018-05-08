@@ -103,7 +103,6 @@ std::string radix_to_string(radix);
 
 struct token {
 
-
 	token_name name;
 	location loc;
 
