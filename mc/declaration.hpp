@@ -6,7 +6,8 @@ enum decl_t {
 	const_t,
 	value_t,
 	param_t,
-	function_t
+	function_t,
+	program_t
 };
 
 struct decl {
@@ -80,3 +81,16 @@ struct param_decl : decl {
 
 	type* param_type;
 };
+
+/*
+struct program_decl : decl {
+
+	program_decl(std::vector<decl*> decl_seq)
+		: decl_seq(decl_seq)
+		, decl(program_t)
+	{}
+
+	std::vector<decl*> decl_seq;
+};
+
+*/

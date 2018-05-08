@@ -1,5 +1,7 @@
 #include "semantics.hpp"
 
+/*	HELPER FUNCTIONS	*/
+
 bool Semantics::is_arithmetic(expr* e)
 {
 	type* t = e->expr_type;
@@ -61,7 +63,6 @@ void Semantics::assert_arithmetic(expr* e)
 	if(!is_arithmetic(e))
 		throw std::runtime_error("Arithmetics type required");
 }
-
 
 type* Semantics::common_type_of(expr* e1, expr* e2)
 {
@@ -164,6 +165,8 @@ expr* Semantics::to_float(expr* e)
 	throw std::runtime_error("Not convertable to float");
 }
 
+/*	DECLARATION SEMANTICS	*/
+
 decl* Semantics::new_program(std::vector<decl*> dec_seq)
 {
 	return nullptr;
@@ -171,49 +174,76 @@ decl* Semantics::new_program(std::vector<decl*> dec_seq)
 
 decl* Semantics::new_var_decl(token* tok, type* t)
 {
-	return nullptr;
+	identifier* id = static_cast<identifier*>(tok);
+	decl* var = new var_decl(id->id, t, nullptr);
+	// scope it
+	return var;
 }
 
-decl* Semantics::new_var_def(decl* var_decl, expr* e)
+decl* Semantics::new_var_def(decl* d, expr* e)
 {
-	return nullptr;
+	var_decl* declaration = static_cast<var_decl*>(d);
+	decl* definition = new var_decl(declaration->id, declaration->var_type, e);
+	// scope it
+	return definition;
 }
 
 decl* Semantics::new_const_decl(token* tok, type* t)
 {
-	return nullptr;
+	identifier* id = static_cast<identifier*>(tok);
+	decl* cons = new const_decl(id->id, t, nullptr);
+	// scope it
+	return cons;
 }
 
-decl* Semantics::new_const_def(decl* var_decl, expr* e)
+decl* Semantics::new_const_def(decl* d, expr* e)
 {
-	return nullptr;
+	const_decl* declaration = static_cast<const_decl*>(d);
+	decl* definition = new const_decl(declaration->id, declaration->const_type, e);
+	// scope it
+	return definition;
 }
 
 decl* Semantics::new_val_decl(token* tok, type* t)
 {
-	return nullptr;
+	identifier* id = static_cast<identifier*>(tok);
+	decl* val = new val_decl(id->id, t, nullptr);
+	// scope it
+	return val;
 }
 
-decl* Semantics::new_val_def(decl* var_decl, expr* e)
+decl* Semantics::new_val_def(decl* d, expr* e)
 {
-	return nullptr;
+	val_decl* declaration = static_cast<val_decl*>(d);
+	decl* definition = new val_decl(declaration->id, declaration->val_type, e);
+	// scope it
+	return definition;
 }
 
 decl* Semantics::new_func_decl(token* tok, std::vector<decl*> params, type* t)
 {
-	return nullptr;
+	identifier* id = static_cast<identifier*>(tok);
+	decl* declaration = new func_decl(id->id, params, t, nullptr);
+	//sceopt it
+	return declaration;
 }
-decl* Semantics::new_func_def(decl* func_decl, stmt* func_body)
+decl* Semantics::new_func_def(decl* fd, stmt* func_body)
 {
-	return nullptr;
+	func_decl* declaration = static_cast<func_decl*>(fd);
+	decl* definition = new func_decl(declaration->id, declaration->params, declaration->ret_type, func_body);
+	// scope it
+	return definition;
 }
 
 decl* Semantics::new_param(token* param, type* t)
 {
-	return nullptr;
+	identifier* id = static_cast<identifier*>(param);
+	decl* parameter = new param_decl(id->id, t);
+	// scope it
+	return parameter;
 }
 
-
+/*	STATEMENT SEMANTICS	*/
 
 stmt* Semantics::new_block_stmt(std::vector<stmt*> stmt_seq)
 {
@@ -254,6 +284,8 @@ stmt* Semantics::new_expr_stmt(expr* expression)
 {
 	return new expr_stmt(expression);
 }
+
+/*	EXPRESSION SEMANTICS	*/
 
 expr* Semantics::new_boolean_literal(token* tok)
 {
