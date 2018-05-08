@@ -60,10 +60,18 @@ struct Semantics {
 	type* new_string_type();
 	type* new_func_type(std::vector<type*> params, type_t ret_type);
 
+
+	// Semantic helper functions 
+	type* common_type_of(expr* e1, expr* e2);
 	expr* basic_to_bool(expr* e);
 	expr* to_int(expr* e);
 	expr* to_float(expr*e);
-	void is_type(expr* e, type_t t);
-	void is_reference(expr* e);
-	void is_same_type(type* t1, type* t2);
+	void assert_type(expr* e, type_t t);
+	void assert_reference(expr* e);
+	void assert_same_type(expr* e1, expr* e2);
+	bool is_reference(expr* e);
+	bool is_same_type(expr* e1, expr* e2);
+	bool is_type(expr* e, type* t);
+	bool is_arithmetic(expr* e);
+	void assert_arithmetic(expr* e)
 };

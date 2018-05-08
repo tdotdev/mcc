@@ -1,21 +1,80 @@
 #include "semantics.hpp"
 
-void Semantics::is_type(expr* e, type_t t)
+bool Semantics::is_arithmetic(expr* e)
+{
+	type* t = e->expr_type;
+
+	switch(t->type_type)
+	{
+		case int_t:
+		case mfloat_t:
+			return true;
+	}
+
+	return false;
+}
+
+bool Semantics::is_type(expr* e, type* t)
+{
+	if (e->expr_type->type_type == t->type_type)
+		return true;
+
+	return false;
+}
+
+bool Semantics::is_reference(expr* e)
+{
+	if (e->expr_type->type_type == ref_t)
+		return true;
+
+	return false;
+}
+
+bool Semantics::is_same_type(expr* e1, expr* e2)
+{
+	if (!(e1->expr_type->type_type == e2->expr_type->type_type))
+		return true;
+
+	return false;
+}
+
+void Semantics::assert_type(expr* e, type_t t)
 {
 	if (!(e->expr_type->type_type == t))
 		throw std::runtime_error("Expr e is not of type t");
 }
 
-void Semantics::is_reference(expr* e)
+void Semantics::assert_reference(expr* e)
 {
-	if (!(e->expr_type->type_type == ref_t))
+	if (!(is_reference(e)))
 		throw std::runtime_error("Reference type required");
 }
 
-void Semantics::is_same_type(type* t1, type* t2)
+void Semantics::assert_same_type(expr* e1, expr* e2)
 {
-	if (!(t1->type_type == t2->type_type))
-		throw std::runtime_error("Non-matching types fam");
+	if (!(e1->expr_type->type_type == e2->expr_type->type_type))
+		throw std::runtime_error("Expr e1 and e2 not same type");
+}
+
+void Semantics::assert_arithmetic(expr* e)
+{
+	if(!is_arithmetic(e))
+		throw std::runtime_error("Arithmetics type required");
+}
+
+
+type* Semantics::common_type_of(expr* e1, expr* e2)
+{
+	if (is_same_type(e1, e2))
+		return e1->expr_type;
+
+	if (is_reference(e1))
+		return e2->expr_type;
+
+	if (is_reference(e2))
+		return e1->expr_type;
+
+	throw std::runtime_error("Undefined common type");
 }
 
 expr* Semantics::basic_to_bool(expr* e)
@@ -72,6 +131,20 @@ expr* Semantics::to_int(expr* e)
 	}
 
 	return new int_literal(val, new_int_type());
+}
+
+expr* Semantics::to_float(expr* e)
+{
+	float val;
+	type* t = e->expr_type;
+	if (t->type_type == int_t)
+	{
+		int_literal* i = static_cast<int_literal*>(e);
+		val = i->value;
+		return new float_literal(val, new_float_type());
+	}
+
+	throw std::runtime_error("Not convertable to float");
 }
 
 decl* Semantics::new_program(std::vector<decl*> dec_seq)
@@ -272,16 +345,16 @@ expr* Semantics::new_log_or_expr(expr* lhs, expr* rhs)
 
 expr* Semantics::new_cond_expr(expr* expr1, expr* expr2, expr* expr3)
 {
-	is_type(expr1, bool_t);
-	is_same_type(expr2->expr_type, expr3->expr_type);
+	assert_type(expr1, bool_t);
+	assert_same_type(expr2, expr3);
 
 	return new cond_expr(expr1, expr2, expr3);
 }
 
 expr* Semantics::new_assign_expr(expr* lhs, expr* rhs)
 {
-	is_reference(lhs);
-	is_same_type(lhs->expr_type, rhs->expr_type);
+	assert_reference(lhs);
+	assert_same_type(lhs, rhs);
 
 	return new assign_expr(lhs, rhs);
 }
