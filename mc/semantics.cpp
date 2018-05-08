@@ -85,24 +85,32 @@ expr* Semantics::basic_to_bool(expr* e)
 	switch (t->type_type)
 	{
 		case bool_t:
+		{
 			bool_literal* b = static_cast<bool_literal*>(e);
 			val = b->value;
 			break;
+		}
 		case int_t:
+		{
 			int_literal* i = static_cast<int_literal*>(e);
 			if (i->value == 0)
 				val = false;
 			break;
+		}
 		case mfloat_t:
+		{
 			float_literal* f = static_cast<float_literal*>(e);
 			if (f->value == 0)
 				val = false;
 			break;
+		}
 		case char_t:
+		{
 			char_literal* c = static_cast<char_literal*>(e);
 			if (c->value == '\0')
 				val = false;
 			break;
+		}
 		default:
 			throw std::runtime_error("Not convertable to bool");
 	}
@@ -118,14 +126,23 @@ expr* Semantics::to_int(expr* e)
 	switch (t->type_type)
 	{
 		case bool_t:
+		{
 			bool_literal* b = static_cast<bool_literal*>(e);
 			val = b->value;
+			break;
+		}
 		case char_t:
+		{
 			char_literal* c = static_cast<char_literal*>(e);
 			val = c->value;
+			break;
+		}
 		case mfloat_t:
+		{
 			float_literal* f = static_cast<float_literal*>(e);
 			val = f->value;
+			break;
+		}
 		default:
 			throw std::runtime_error("Not convertable to int");
 	}
@@ -340,7 +357,9 @@ expr* Semantics::new_log_and_expr(expr* lhs, expr* rhs)
 
 expr* Semantics::new_log_or_expr(expr* lhs, expr* rhs)
 {
-	return nullptr;
+	
+
+	return new binary_expr(bop_lor, lhs, rhs, lhs->expr_type);
 }
 
 expr* Semantics::new_cond_expr(expr* expr1, expr* expr2, expr* expr3)

@@ -1,4 +1,8 @@
 #Parser Test program
 
 
-def x : int = 0;
+def main(a : int) -> int
+{
+	if((1 + 1) == 0)
+	return 0;
+}

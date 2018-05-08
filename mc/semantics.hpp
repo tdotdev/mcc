@@ -73,5 +73,5 @@ struct Semantics {
 	bool is_same_type(expr* e1, expr* e2);
 	bool is_type(expr* e, type* t);
 	bool is_arithmetic(expr* e);
-	void assert_arithmetic(expr* e)
+	void assert_arithmetic(expr* e);
 };

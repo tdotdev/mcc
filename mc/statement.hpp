@@ -1,9 +1,6 @@
 #pragma once
 
-#include <vector>
-#include "expression.hpp"
-#include "statement.hpp"
-#include "declaration.hpp"
+struct decl;
 
 enum stmt_t {
 	block_t,
@@ -12,7 +9,7 @@ enum stmt_t {
 	break_t,
 	continue_t,
 	return_t,
-	decl_t,
+	declstmt_t,
 	expr_t,
 	default_t
 };
@@ -91,7 +88,7 @@ struct decl_stmt : stmt {
 
 	decl_stmt(decl* d)
 		: declaration(d)
-		, stmt(decl_t)
+		, stmt(declstmt_t)
 	{}
 
 	decl* declaration;
