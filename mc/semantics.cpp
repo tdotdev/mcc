@@ -16,6 +16,24 @@ bool Semantics::is_arithmetic(expr* e)
 	return false;
 }
 
+type* Semantics::val_conv(expr* e)
+{
+	ref_type* r = dynamic_cast<ref_type*>(e->expr_type);
+	if (r != nullptr)
+		return r;
+	
+
+	throw std::runtime_error("Expected reference type");
+}
+
+bool Semantics::val_conv_is(expr* e, type* t)
+{
+	if (val_conv(e)->type_type == t->type_type)
+		return true;
+	
+	return false;
+}
+
 bool Semantics::is_scalar(expr* e)
 {
 	type* t = e->expr_type;
@@ -50,6 +68,8 @@ bool Semantics::is_int(expr* e)
 {
 	if (e->expr_type->type_type == int_t)
 		return true;
+
+
 	return false;
 }
 
@@ -96,7 +116,7 @@ expr* Semantics::basic_to_bool(expr* e)
 
 bool Semantics::is_same_type(expr* e1, expr* e2)
 {
-	if (!(e1->expr_type->type_type == e2->expr_type->type_type))
+	if (e1->expr_type->type_type == e2->expr_type->type_type)
 		return true;
 
 	return false;
@@ -454,14 +474,80 @@ expr* Semantics::new_identifier(token* tok)
 	return nullptr;
 }
 
-expr* Semantics::new_postfix_expr(expr* expression, std::vector<expr*> args)
+expr* Semantics::new_postfix_expr(expr* e, std::vector<expr*> args)
 {
-	return nullptr;
+	assert_type(e, func_t);
+	function_type* func = static_cast<function_type*>(e->expr_type);
+	std::vector<type*> params = func->params;
+
+	if (args.size() == params.size())
+	{
+		for (auto i = 0; i < params.size(); i++)
+		{
+			if (params[i]->type_type != args[i]->expr_type->type_type)
+				throw std::runtime_error("Type error in arguments");
+		}
+
+		return new func_expr(e->expr_type, e, args);
+	}
+
+	throw std::runtime_error("Invalid number of arguments");
 }
 
-expr* Semantics::new_unary_expr(token_name unary_op, expr* expression)
+unary_op tok_to_op(token_name n)
 {
-	return nullptr;
+	switch (n)
+	{
+		case tok_add:
+			return u_add;
+		case tok_sub:
+			return u_sub;
+		case tok_bitw_not:
+			return u_sub;
+		case tok_logical_not:
+			return u_not;
+		case tok_bitw_and:
+			return u_ref;
+		case tok_mul:
+			return u_deref;
+	default:
+		throw std::runtime_error("Expected unary op token");
+	}
+}
+
+expr* Semantics::new_unary_expr(token_name unary_op, expr* e)
+{
+	switch (unary_op)
+	{
+		case tok_add:
+		case tok_sub:
+		{
+			assert_arithmetic(e);
+			return new unary_expr(tok_to_op(unary_op), e, e->expr_type);
+		}
+		case tok_bitw_not:
+		{
+			assert_type(e, int_t);
+			return new unary_expr(tok_to_op(unary_op), e, new_int_type());
+		}
+		case tok_logical_not:
+		{
+			assert_type(e, bool_t);
+			return new unary_expr(tok_to_op(unary_op), e, new_bool_type());
+		}
+		case tok_bitw_and:
+		{
+			assert_type(e, ref_t);
+			return new unary_expr(tok_to_op(unary_op), e, new_ptr_type(e->expr_type));
+		}
+		case tok_mul:
+		{
+			assert_type(e, ptr_t);
+			return new unary_expr(tok_to_op(unary_op), e, new_ref_type(e->expr_type));
+		}
+	}
+
+	throw std::runtime_error("Expected unary expression");
 }
 
 expr* Semantics::new_cast_expr(expr* expr, type* ts)
@@ -676,6 +762,16 @@ type* Semantics::new_float_type()
 type* Semantics::new_char_type()
 {
 	return new char_type(char_t);
+}
+
+type* Semantics::new_ptr_type(type* t)
+{
+	return new ptr_type(t, ptr_t);
+}
+
+type* Semantics::new_ref_type(type* t)
+{
+	return new ref_type(t, ref_t);
 }
 
 type* Semantics::new_string_type()

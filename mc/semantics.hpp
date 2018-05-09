@@ -60,11 +60,15 @@ struct Semantics {
 	type* new_char_type();
 	type* new_string_type();
 	type* new_func_type(std::vector<type*> params, type_t ret_type);
+	type* new_ptr_type(type* ptr_to);
+	type* new_ref_type(type* ref_to);
 
 
 	// Semantic helper functions 
 	type* common_type_of(expr* e1, expr* e2);
 	type* verify_conversion(expr* e, type* t);
+	type* val_conv(expr* e);
+
 	expr* basic_to_bool(expr* e);
 	expr* to_int(expr* e);
 	expr* to_float(expr*e);
@@ -82,4 +86,6 @@ struct Semantics {
 	bool is_type(expr* e, type* t);
 	bool is_arithmetic(expr* e);
 	bool is_int(expr* e);
+	bool val_conv_is(expr* e, type* t);
+
 };

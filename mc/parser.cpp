@@ -239,15 +239,19 @@ token*Parser::match_if_postfix_expr()
 
 expr* Parser::parse_postfix_expr()
 {
-	expr* primary_expr = parse_primary_expr();
-	std::vector<expr*> arg_list;
+	expr* e = parse_primary_expr();
+
 	while (match_if_postfix_expr())
 	{
+		std::vector<expr*> arg_list;
+		if (lookahead() != tok_left_paren)
+			break;
 		arg_list = parse_arg_list();
-		accept();
+		accept(); 
+		e = semantics.new_postfix_expr(e, arg_list);
 	}
 
-	return semantics.new_postfix_expr(primary_expr, arg_list);
+	return e;
 }
 
 token*Parser::match_if_arg_list()
@@ -360,7 +364,7 @@ expr* Parser::parse_add_expr()
 	while (token* tok = match_if_add_expr())
 	{
 		expr* mul_expr_more = parse_mul_expr();
-		mul_expr = semantics.new_mul_expr(tok->getType(), mul_expr, mul_expr_more);
+		mul_expr = semantics.new_add_expr(tok->getType(), mul_expr, mul_expr_more);
 	}
 
 	return mul_expr;
@@ -384,7 +388,7 @@ expr* Parser::parse_shift_expr()
 	while (token* tok = match_if_shift_expr())
 	{
 		expr* add_expr_more = parse_add_expr();
-		add_expr = semantics.new_add_expr(tok->getType(), add_expr, add_expr_more);
+		add_expr = semantics.new_shift_expr(tok->getType(), add_expr, add_expr_more);
 	}
 
 	return add_expr;
@@ -411,7 +415,7 @@ expr* Parser::parse_rel_expr()
 	while (token* tok = match_if_rel_expr())
 	{
 		expr* shift_expr_more = parse_shift_expr();
-		shift_expr = semantics.new_shift_expr(tok->getType(), shift_expr, shift_expr_more);
+		shift_expr = semantics.new_rel_expr(tok->getType(), shift_expr, shift_expr_more);
 	}
 
 	return shift_expr;

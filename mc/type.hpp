@@ -23,8 +23,17 @@ struct type {
 	{}
 
 	type_t type_type;
+	virtual ~type() = default;
 };
 
+struct ptr_type : type {
+	ptr_type(type* r, type_t t)
+		: type(t)
+		, ptr_to_type(r)
+	{}
+
+	type* ptr_to_type;
+};
 
 struct void_type : type {
 	void_type(type_t t)

@@ -91,7 +91,24 @@ enum binary_op {
 };
 
 enum unary_op {
+	u_add,
+	u_sub,
+	u_bwnot,
+	u_not,
+	u_ref,
+	u_deref
+};
 
+struct unary_expr : expr {
+
+	unary_expr(unary_op u, expr* e, type* t)
+		: u_op(u)
+		, e(e)
+		, expr(t)
+	{}
+
+	unary_op u_op;
+	expr* e;
 };
 
 struct binary_expr : expr {
@@ -117,6 +134,18 @@ struct assign_expr : expr {
 
 	expr* ref;
 	expr* val;
+};
+
+struct func_expr : expr {
+
+	func_expr(type* ret, expr* e, std::vector<expr*> args)
+		: e(e)
+		, expr(ret)
+		, args(args)
+	{}
+
+	expr* e;
+	std::vector<expr*> args;
 };
 
 struct cast_expr : expr {
