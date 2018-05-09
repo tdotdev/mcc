@@ -82,7 +82,7 @@ enum binary_op {
 	bop_eq,
 	bop_neq,
 
-	bop_band,
+	bop_bwand,
 	bop_bwxor,
 	bop_bwor,
 
@@ -146,5 +146,8 @@ struct cond_expr : expr {
 };
 
 struct call_expr : expr {
-
+	call_expr()
+	{
+		throw std::runtime_error("not yet impl");
+	}
 };

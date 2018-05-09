@@ -12,7 +12,9 @@ enum type_t {
 	char_t,
 	string_t,
 	ref_t,
-	func_t
+	ptr_t,
+	func_t,
+	scalar_t
 };
 
 struct type {
@@ -35,6 +37,7 @@ struct bool_type : type {
 		: type(t)
 	{}
 };
+
 
 struct int_type : type {
 	int_type(type_t t)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <unordered_map>
 #include "expression.hpp"
 #include "statement.hpp"
 #include "declaration.hpp"
@@ -40,7 +41,7 @@ struct Semantics {
 	expr* new_unary_expr(token_name unary_op, expr* expression);
 	expr* new_cast_expr(expr* cast_expr, type* ts);
 	expr* new_mul_expr(token_name mul_op, expr* lhs, expr* rhs);
-	expr* new_add_expr(token_name ad_op, expr* lhs, expr* rhs);
+	expr* new_add_expr(token_name add_op, expr* lhs, expr* rhs);
 	expr* new_shift_expr(token_name shift_op, expr* lhs, expr* rhs);
 	expr* new_rel_expr(token_name rel_op, expr* lhs, expr* rhs);
 	expr* new_eq_expr(token_name eq_op, expr* lhs, expr* rhs);
@@ -63,15 +64,22 @@ struct Semantics {
 
 	// Semantic helper functions 
 	type* common_type_of(expr* e1, expr* e2);
+	type* verify_conversion(expr* e, type* t);
 	expr* basic_to_bool(expr* e);
 	expr* to_int(expr* e);
 	expr* to_float(expr*e);
+
 	void assert_type(expr* e, type_t t);
 	void assert_reference(expr* e);
 	void assert_same_type(expr* e1, expr* e2);
+	void assert_arithmetic(expr* e);
+	void assert_int(expr* e);
+	void assert_scalar(expr* e);
+
+	bool is_scalar(expr* e);
 	bool is_reference(expr* e);
 	bool is_same_type(expr* e1, expr* e2);
 	bool is_type(expr* e, type* t);
 	bool is_arithmetic(expr* e);
-	void assert_arithmetic(expr* e);
+	bool is_int(expr* e);
 };

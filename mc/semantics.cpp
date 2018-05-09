@@ -16,6 +16,20 @@ bool Semantics::is_arithmetic(expr* e)
 	return false;
 }
 
+bool Semantics::is_scalar(expr* e)
+{
+	type* t = e->expr_type;
+
+	switch (t->type_type)
+	{
+		case func_t:
+		case ref_t:
+			return false;
+		default:
+			return true;
+	}
+}
+
 bool Semantics::is_type(expr* e, type* t)
 {
 	if (e->expr_type->type_type == t->type_type)
@@ -32,50 +46,11 @@ bool Semantics::is_reference(expr* e)
 	return false;
 }
 
-bool Semantics::is_same_type(expr* e1, expr* e2)
+bool Semantics::is_int(expr* e)
 {
-	if (!(e1->expr_type->type_type == e2->expr_type->type_type))
+	if (e->expr_type->type_type == int_t)
 		return true;
-
 	return false;
-}
-
-void Semantics::assert_type(expr* e, type_t t)
-{
-	if (!(e->expr_type->type_type == t))
-		throw std::runtime_error("Expr e is not of type t");
-}
-
-void Semantics::assert_reference(expr* e)
-{
-	if (!(is_reference(e)))
-		throw std::runtime_error("Reference type required");
-}
-
-void Semantics::assert_same_type(expr* e1, expr* e2)
-{
-	if (!(e1->expr_type->type_type == e2->expr_type->type_type))
-		throw std::runtime_error("Expr e1 and e2 not same type");
-}
-
-void Semantics::assert_arithmetic(expr* e)
-{
-	if(!is_arithmetic(e))
-		throw std::runtime_error("Arithmetics type required");
-}
-
-type* Semantics::common_type_of(expr* e1, expr* e2)
-{
-	if (is_same_type(e1, e2))
-		return e1->expr_type;
-
-	if (is_reference(e1))
-		return e2->expr_type;
-
-	if (is_reference(e2))
-		return e1->expr_type;
-
-	throw std::runtime_error("Undefined common type");
 }
 
 expr* Semantics::basic_to_bool(expr* e)
@@ -118,6 +93,157 @@ expr* Semantics::basic_to_bool(expr* e)
 
 	return new bool_literal(val, new_bool_type());
 }
+
+bool Semantics::is_same_type(expr* e1, expr* e2)
+{
+	if (!(e1->expr_type->type_type == e2->expr_type->type_type))
+		return true;
+
+	return false;
+}
+
+void Semantics::assert_scalar(expr* e)
+{
+	if (!(is_scalar(e)))
+		throw std::runtime_error("Expected scalar type");
+}
+
+void Semantics::assert_type(expr* e, type_t t)
+{
+	if (!(e->expr_type->type_type == t))
+		throw std::runtime_error("Expr e is not of type t");
+}
+
+void Semantics::assert_reference(expr* e)
+{
+	if (!(is_reference(e)))
+		throw std::runtime_error("Reference type required");
+}
+
+void Semantics::assert_int(expr* e)
+{
+	if (!(is_int(e)))
+		throw std::runtime_error("Integer type required");
+}
+
+void Semantics::assert_same_type(expr* e1, expr* e2)
+{
+	if (!(e1->expr_type->type_type == e2->expr_type->type_type))
+		throw std::runtime_error("Expr e1 and e2 not same type");
+}
+
+void Semantics::assert_arithmetic(expr* e)
+{
+	if(!is_arithmetic(e))
+		throw std::runtime_error("Arithmetics type required");
+}
+
+type* Semantics::verify_conversion(expr* e, type* dest_type)
+{
+	type* expr_t = e->expr_type;
+
+	switch (expr_t->type_type)
+	{
+		case bool_t:
+		{
+			switch (dest_type->type_type)
+			{
+				case bool_t:
+				case int_t:
+					return new_bool_type();
+				default:
+					return nullptr;
+			}
+		}
+		case char_t:
+		{
+			switch (dest_type->type_type)
+			{
+				case char_t:
+					return new_char_type();
+				case int_t:
+					return new_char_type();
+				case bool_t:
+					return new_bool_type();
+				default:
+					return nullptr;
+
+			}
+		}
+		case int_t:
+		{
+			switch (dest_type->type_type)
+			{
+				case bool_t:
+					return new_bool_type();
+				case char_t:
+					return new_char_type();
+				case int_t:
+					return new_int_type();
+				case mfloat_t:
+					return new_int_type();
+				default:
+					return nullptr;
+			}
+		}
+		case mfloat_t:
+		{
+			switch (dest_type->type_type)
+			{
+
+				case int_t:
+					return new_int_type();
+				case mfloat_t:
+					return new_float_type();
+				case bool_t:
+					return new_bool_type();
+				default:
+					return nullptr;
+			}
+		}
+		case ptr_t:
+		{
+			switch (dest_type->type_type)
+			{
+				case ptr_t:
+					return nullptr;
+				case bool_t:
+					return new_bool_type();
+				default:
+					return nullptr;
+			}
+		}
+		case ref_t:
+		{
+			switch (dest_type->type_type)
+			{
+				case ref_t:
+					return nullptr;
+				default:
+					return nullptr;
+			}
+		}
+		default:
+			throw std::runtime_error("Unsupported type provided");
+	}
+
+}
+
+type* Semantics::common_type_of(expr* e1, expr* e2)
+{
+	if (is_same_type(e1, e2))
+		return e1->expr_type;
+
+	if (is_reference(e1))
+		return e2->expr_type;
+
+	if (is_reference(e2))
+		return e1->expr_type;
+
+	throw std::runtime_error("Undefined common type");
+}
+
+
 
 expr* Semantics::to_int(expr* e)
 {
@@ -324,6 +450,7 @@ expr* Semantics::new_string_literal(token* tok)
 
 expr* Semantics::new_identifier(token* tok)
 {
+
 	return nullptr;
 }
 
@@ -337,61 +464,177 @@ expr* Semantics::new_unary_expr(token_name unary_op, expr* expression)
 	return nullptr;
 }
 
-expr* Semantics::new_cast_expr(expr* cast_expr, type* ts)
+expr* Semantics::new_cast_expr(expr* expr, type* ts)
 {
-	return nullptr;
+	type* t = verify_conversion(expr, ts);
+
+	if (t == nullptr)
+		throw std::runtime_error("Invalid cast expression");
+
+	return new cast_expr(expr, ts);
 }
 
 expr* Semantics::new_mul_expr(token_name mul_op, expr* lhs, expr* rhs)
 {
-	return nullptr;
+	assert_arithmetic(lhs);
+	assert_arithmetic(rhs);
+
+	type* t = common_type_of(lhs, rhs);
+
+	binary_op op;
+
+	switch (mul_op)
+	{
+		case tok_mul:
+			op = bop_mul;
+			break;
+		case tok_div:
+			op = bop_div;
+			break;
+		case tok_rem:
+			op = bop_rem;
+			break;
+		default:
+			throw std::runtime_error("Expected multiplicative operation");
+	}
+
+	return new binary_expr(op, lhs, rhs, t);
 }
 
-expr* Semantics::new_add_expr(token_name ad_op, expr* lhs, expr* rhs)
+expr* Semantics::new_add_expr(token_name add_op, expr* lhs, expr* rhs)
 {
-	return nullptr;
+	assert_arithmetic(lhs);
+	assert_arithmetic(rhs);
+
+	type* t = common_type_of(lhs, rhs);
+
+	binary_op op;
+
+	switch (add_op)
+	{
+		case tok_add:
+			op = bop_add;
+			break;
+		case tok_sub:
+			op = bop_sub;
+			break;
+		default:
+			throw std::runtime_error("Expected additive operation");
+	}
+
+	return new binary_expr(op, lhs, rhs, t);
 }
 
 expr* Semantics::new_shift_expr(token_name shift_op, expr* lhs, expr* rhs)
 {
-	return nullptr;
+	assert_int(lhs);
+	assert_int(rhs);
+
+	binary_op op;
+
+	switch (shift_op)
+	{
+	case tok_shift_left:
+		op = bop_lshift;
+		break;
+	case tok_shift_right:
+		op = bop_rshift;
+		break;
+	default:
+		throw std::runtime_error("Expected shift operation");
+	}
+
+	return new binary_expr(op, lhs, rhs, new_int_type());
 }
 
 expr* Semantics::new_rel_expr(token_name rel_op, expr* lhs, expr* rhs)
 {
-	return nullptr;
+	assert_scalar(lhs);
+	assert_scalar(rhs);
+
+	binary_op op;
+
+	switch (rel_op)
+	{
+		case tok_rel_gt:
+			op = bop_gt;
+			break;
+		case tok_rel_lt:
+			op = bop_lt;
+			break;
+		case tok_rel_ge:
+			op = bop_gte;
+			break;
+		case tok_rel_le:
+			op = bop_lte;
+			break;
+	default:
+		throw std::runtime_error("Expected shift operation");
+	}
+
+	return new binary_expr(op, lhs, rhs, new_bool_type());
 }
 
 expr* Semantics::new_eq_expr(token_name eq_op, expr* lhs, expr* rhs)
 {
-	return nullptr;
+	assert_scalar(lhs);
+	assert_scalar(rhs);
+
+	binary_op op;
+
+	switch (eq_op)
+	{
+	case tok_rel_eq:
+		op = bop_eq;
+		break;
+	case tok_rel_neq:
+		op = bop_neq;
+		break;
+	default:
+		throw std::runtime_error("Expected equality operation");
+	}
+
+	return new binary_expr(op, lhs, rhs, new_bool_type());
 }
 
 expr* Semantics::new_bw_and_expr(expr* lhs, expr* rhs)
 {
-	return nullptr;
+	assert_int(lhs);
+	assert_int(rhs);
+
+	return new binary_expr(bop_bwand, lhs, rhs, new_int_type());
 }
 
 expr* Semantics::new_bw_xor_expr(expr* lhs, expr* rhs)
 {
-	return nullptr;
+	assert_int(lhs);
+	assert_int(rhs);
+
+	return new binary_expr(bop_bwxor, lhs, rhs, new_int_type());
 }
 
 expr* Semantics::new_bw_or_expr(expr* lhs, expr* rhs)
 {
-	return nullptr;
+	assert_int(lhs);
+	assert_int(rhs);
+
+	return new binary_expr(bop_bwor, lhs, rhs, new_int_type());
 }
 
 expr* Semantics::new_log_and_expr(expr* lhs, expr* rhs)
 {
-	return nullptr;
+	assert_scalar(lhs);
+	assert_scalar(rhs);
+
+	return new binary_expr(bop_land, lhs, rhs, new_bool_type());
 }
 
 expr* Semantics::new_log_or_expr(expr* lhs, expr* rhs)
 {
-	
+	assert_scalar(lhs);
+	assert_scalar(rhs);
 
-	return new binary_expr(bop_lor, lhs, rhs, lhs->expr_type);
+	return new binary_expr(bop_lor, lhs, rhs, new_bool_type());
 }
 
 expr* Semantics::new_cond_expr(expr* expr1, expr* expr2, expr* expr3)
