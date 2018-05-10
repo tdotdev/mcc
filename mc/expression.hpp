@@ -180,3 +180,17 @@ struct call_expr : expr {
 		throw std::runtime_error("not yet impl");
 	}
 };
+
+struct id_expr : expr {
+	id_expr()
+	{
+		throw std::runtime_error("not yet impl");
+	}
+};
+
+struct conv_expr : expr {
+	conv_expr()
+	{
+		throw std::runtime_error("not yet impl");
+	}
+};

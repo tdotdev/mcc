@@ -17,6 +17,10 @@ struct decl {
 		, decl_type(t)
 	{}
 
+	decl(decl_t t)
+		: decl_type(t)
+	{}
+
 	std::string id;
 	decl_t decl_type;
 };
@@ -82,7 +86,7 @@ struct param_decl : decl {
 	type* param_type;
 };
 
-/*
+
 struct program_decl : decl {
 
 	program_decl(std::vector<decl*> decl_seq)
@@ -93,4 +97,3 @@ struct program_decl : decl {
 	std::vector<decl*> decl_seq;
 };
 
-*/
