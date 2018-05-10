@@ -343,6 +343,9 @@ token* lexer::lex_word() {
 		else if (reserved.at(word) == tok_false)
 			return new boolean(false, current);
 
+		else if (reserved.at(word) == tok_identifier)
+			return new identifier(word, current);
+
 		else 
 			return new token(reserved.at(word), current);
 	}

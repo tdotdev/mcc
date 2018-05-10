@@ -2,6 +2,8 @@
 
 #include "type.hpp"
 
+struct decl;
+
 struct expr {
 
 	expr() = default;
@@ -182,10 +184,12 @@ struct call_expr : expr {
 };
 
 struct id_expr : expr {
-	id_expr()
-	{
-		throw std::runtime_error("not yet impl");
-	}
+	id_expr(decl* d, type* t)
+		: ref_to(d)
+		, expr(t) // id_t
+	{}
+
+	decl* ref_to;
 };
 
 struct conv_expr : expr {

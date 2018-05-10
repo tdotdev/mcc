@@ -117,6 +117,14 @@ expr* Semantics::basic_to_bool(expr* e)
 
 bool Semantics::is_same_type(expr* e1, expr* e2)
 {
+	if (e1->expr_type->type_type == ref_t)
+	{
+		id_expr* e = static_cast<id_expr*>(e1);
+		var_decl* v = static_cast<var_decl*>(e->ref_to);
+		if (v->var_type->type_type == e2->expr_type->type_type)
+			return true;
+	}
+
 	if (e1->expr_type->type_type == e2->expr_type->type_type)
 		return true;
 
@@ -149,7 +157,7 @@ void Semantics::assert_int(expr* e)
 
 void Semantics::assert_same_type(expr* e1, expr* e2)
 {
-	if (!(e1->expr_type->type_type == e2->expr_type->type_type))
+	if (!(is_same_type(e1, e2)))
 		throw std::runtime_error("Expr e1 and e2 not same type");
 }
 
@@ -314,9 +322,9 @@ expr* Semantics::to_float(expr* e)
 
 /*	DECLARATION SEMANTICS	*/
 
-decl* Semantics::new_program(std::vector<decl*> dec_seq)
+decl* Semantics::new_program(std::vector<decl*> decl_seq)
 {
-	return nullptr;
+	return new program_decl(decl_seq);
 }
 
 decl* Semantics::new_var_decl(token* tok, type* t)
@@ -479,10 +487,29 @@ expr* Semantics::new_string_literal(token* tok)
 	return new string_literal(str_tok->val, new_string_type());
 }
 
+decl* Semantics::lookup(std::string id)
+{
+	scope* s = sem_scope;
+
+	while (s->parent_scope != nullptr)
+	{
+		 decl* d = sem_scope->find_decl(id);
+		 if (d != nullptr)
+			 return d;
+	}
+
+	throw std::runtime_error("Undefined reference");
+}
+
 expr* Semantics::new_identifier(token* tok)
 {
+	identifier* id_tok = static_cast<identifier*>(tok);
 
-	return nullptr;
+	decl* d = lookup(id_tok->id);
+	
+	var_decl* v = static_cast<var_decl*>(d);
+
+	return new id_expr(d, new_ref_type(v->var_type));
 }
 
 expr* Semantics::new_postfix_expr(expr* e, std::vector<expr*> args)

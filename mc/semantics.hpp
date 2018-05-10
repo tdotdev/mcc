@@ -77,6 +77,8 @@ struct Semantics {
 	void exit_current_scope();
 
 	// Semantic helper functions 
+	decl* lookup(std::string id);
+
 	type* common_type_of(expr* e1, expr* e2);
 	type* verify_conversion(expr* e, type* t);
 	type* val_conv(expr* e);
