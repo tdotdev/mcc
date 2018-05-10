@@ -213,7 +213,9 @@ expr* Parser::parse_primary_expr()
 		case tok_string:
 			return semantics.new_string_literal(accept());
 		case tok_identifier:
+		{
 			return semantics.new_identifier(accept());
+		}
 
 		case tok_left_paren:
 			match(tok_left_paren);
@@ -239,13 +241,12 @@ token*Parser::match_if_postfix_expr()
 
 expr* Parser::parse_postfix_expr()
 {
+	token* name = *first;
 	expr* e = parse_primary_expr();
 
 	while (match_if_postfix_expr())
 	{
 		std::vector<expr*> arg_list;
-		if (lookahead() != tok_left_paren)
-			break;
 		arg_list = parse_arg_list();
 		accept(); 
 		e = semantics.new_postfix_expr(e, arg_list);

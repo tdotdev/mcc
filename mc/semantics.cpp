@@ -490,9 +490,9 @@ decl* Semantics::lookup(std::string id)
 {
 	scope* s = sem_scope;
 
-	while (s->parent_scope != nullptr)
+	while (s != nullptr)
 	{
-		 decl* d = sem_scope->find_decl(id);
+		 decl* d = s->find_decl(id);
 		 if (d != nullptr)
 			 return d;
 		 s = s->parent_scope;
@@ -514,7 +514,13 @@ expr* Semantics::new_identifier(token* tok)
 
 expr* Semantics::new_postfix_expr(expr* e, std::vector<expr*> args)
 {
-	assert_type(e, func_t);
+	//assert_type(e, func_t);
+
+	ref_type* r = static_cast<ref_type*>(e->expr_type);
+
+	//identifier* id_tok = static_cast<identifier*>(tok);
+	//decl* function_declaration = lookup(id_tok->id);
+
 	function_type* func = static_cast<function_type*>(e->expr_type);
 	std::vector<type*> params = func->params;
 
