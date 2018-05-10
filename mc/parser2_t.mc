@@ -1,5 +1,7 @@
 def main(a : int) -> int
 {
+	var y : int = 0;
+
 	if((1 + 1) == 0)
 	{
 		0 + 0;
@@ -9,10 +11,6 @@ def main(a : int) -> int
 		3 == 4;
 	}
 
-
-	var y : int = 0 + 4 + 6 + 5;
-
-	
 
 	return 0;
 }

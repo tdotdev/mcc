@@ -651,9 +651,10 @@ stmt* Parser::parse_stmt()
 stmt* Parser::parse_block_stmt()
 {
 	match(tok_left_brace);
+	semantics.new_block_scope();
 	std::vector<stmt*> stmt_seq = parse_stmt_seq();
 	match(tok_right_brace);
-
+	semantics.exit_current_scope();
 	return semantics.new_block_stmt(stmt_seq);
 }
 
@@ -769,6 +770,7 @@ stmt* Parser::parse_return_stmt()
 stmt* Parser::parse_decl_stmt()
 {
 	decl* local_dec = parse_local_decl();
+
 
 	return semantics.new_decl_stmt(local_dec);
 }
@@ -925,11 +927,15 @@ decl* Parser::parse_func_def()
 	token* func_id = accept_if(tok_identifier);
 	match(tok_left_paren);
 	std::vector<decl*> param_list;
-	if(lookahead() != tok_right_paren)
+	semantics.new_param_scope();
+	if (lookahead() != tok_right_paren)
+	{
 		param_list = parse_param_list();
+	}
 	match(tok_right_paren);
 	match(tok_sub);
 	match(tok_rel_gt);
+	semantics.exit_current_scope();
 
 	type* t = parse_type();
 	decl* func_decl = semantics.new_func_decl(func_id, param_list, t);

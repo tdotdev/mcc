@@ -8,6 +8,7 @@
 #include "declaration.hpp"
 #include "type.hpp"
 #include "statement.hpp"
+#include "scope.hpp"
 
 #include <vector>
 #include <cassert>

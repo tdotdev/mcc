@@ -7,9 +7,17 @@
 #include "declaration.hpp"
 #include "type.hpp"
 #include "token.hpp"
+#include "scope.hpp"
 
 
 struct Semantics {
+
+	Semantics()
+	{
+		sem_scope = new scope(global);
+	}
+
+	scope* sem_scope;
 
 	decl* new_program(std::vector<decl*> dec_seq);
 	decl* new_var_decl(token* tok, type* t);
@@ -63,6 +71,10 @@ struct Semantics {
 	type* new_ptr_type(type* ptr_to);
 	type* new_ref_type(type* ref_to);
 
+	void new_global_scope();;
+	void new_param_scope();
+	void new_block_scope();
+	void exit_current_scope();
 
 	// Semantic helper functions 
 	type* common_type_of(expr* e1, expr* e2);

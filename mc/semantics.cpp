@@ -2,6 +2,7 @@
 
 /*	HELPER FUNCTIONS	*/
 
+
 bool Semantics::is_arithmetic(expr* e)
 {
 	type* t = e->expr_type;
@@ -322,7 +323,9 @@ decl* Semantics::new_var_decl(token* tok, type* t)
 {
 	identifier* id = static_cast<identifier*>(tok);
 	decl* var = new var_decl(id->id, t, nullptr);
-	// scope it
+
+	sem_scope->add_decl(id->id, var);
+
 	return var;
 }
 
@@ -330,7 +333,7 @@ decl* Semantics::new_var_def(decl* d, expr* e)
 {
 	var_decl* declaration = static_cast<var_decl*>(d);
 	decl* definition = new var_decl(declaration->id, declaration->var_type, e);
-	// scope it
+
 	return definition;
 }
 
@@ -338,7 +341,9 @@ decl* Semantics::new_const_decl(token* tok, type* t)
 {
 	identifier* id = static_cast<identifier*>(tok);
 	decl* cons = new const_decl(id->id, t, nullptr);
-	// scope it
+
+	sem_scope->add_decl(id->id, cons);
+
 	return cons;
 }
 
@@ -346,7 +351,7 @@ decl* Semantics::new_const_def(decl* d, expr* e)
 {
 	const_decl* declaration = static_cast<const_decl*>(d);
 	decl* definition = new const_decl(declaration->id, declaration->const_type, e);
-	// scope it
+
 	return definition;
 }
 
@@ -354,7 +359,9 @@ decl* Semantics::new_val_decl(token* tok, type* t)
 {
 	identifier* id = static_cast<identifier*>(tok);
 	decl* val = new val_decl(id->id, t, nullptr);
-	// scope it
+
+	sem_scope->add_decl(id->id, val);
+
 	return val;
 }
 
@@ -362,7 +369,7 @@ decl* Semantics::new_val_def(decl* d, expr* e)
 {
 	val_decl* declaration = static_cast<val_decl*>(d);
 	decl* definition = new val_decl(declaration->id, declaration->val_type, e);
-	// scope it
+
 	return definition;
 }
 
@@ -370,7 +377,9 @@ decl* Semantics::new_func_decl(token* tok, std::vector<decl*> params, type* t)
 {
 	identifier* id = static_cast<identifier*>(tok);
 	decl* declaration = new func_decl(id->id, params, t, nullptr);
-	//sceopt it
+
+	sem_scope->add_decl(id->id, declaration);
+
 	return declaration;
 }
 decl* Semantics::new_func_def(decl* fd, stmt* func_body)
@@ -385,7 +394,9 @@ decl* Semantics::new_param(token* param, type* t)
 {
 	identifier* id = static_cast<identifier*>(param);
 	decl* parameter = new param_decl(id->id, t);
-	// scope it
+
+	sem_scope->add_decl(id->id, parameter);
+
 	return parameter;
 }
 
@@ -782,4 +793,29 @@ type* Semantics::new_string_type()
 type* Semantics::new_func_type(std::vector<type*> params, type_t ret_type)
 {
 	return new function_type(params, ret_type);
+}
+
+void Semantics::new_global_scope()
+{
+	sem_scope = new scope(global);
+}
+
+void Semantics::new_param_scope()
+{
+	scope* new_scope = new scope(parameter);
+	new_scope->parent_scope = sem_scope;
+	sem_scope = new_scope;
+
+}
+
+void Semantics::new_block_scope()
+{
+	scope* new_scope = new scope(block);
+	new_scope->parent_scope = sem_scope;
+	sem_scope = new_scope;
+}
+
+void Semantics::exit_current_scope()
+{
+	sem_scope = sem_scope->parent_scope;
 }
