@@ -496,6 +496,7 @@ decl* Semantics::lookup(std::string id)
 		 decl* d = sem_scope->find_decl(id);
 		 if (d != nullptr)
 			 return d;
+		 s = s->parent_scope;
 	}
 
 	throw std::runtime_error("Undefined reference");
