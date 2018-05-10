@@ -1,4 +1,4 @@
-/*
+
 
 #include "codegen.hpp"
 #include "type.hpp"
@@ -732,5 +732,3 @@ generate(const decl* d)
 	// Dump the generated module to 
 	llvm::outs() << *mod.get_module();
 }
-
-*/

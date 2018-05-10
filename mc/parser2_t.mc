@@ -5,5 +5,6 @@ def main(a : int) -> int
 
 	y = x;
 
+
 	return 0;
 }

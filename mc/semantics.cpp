@@ -70,7 +70,6 @@ bool Semantics::is_int(expr* e)
 	if (e->expr_type->type_type == int_t)
 		return true;
 
-
 	return false;
 }
 
